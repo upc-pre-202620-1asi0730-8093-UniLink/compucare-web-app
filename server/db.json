@@ -1,0 +1,173 @@
+{
+  "plans": [
+    {
+      "id": 1,
+      "code": "basico",
+      "name": "Básico",
+      "price": 99,
+      "hours": 5,
+      "preventiveVisits": 1
+    },
+    {
+      "id": 2,
+      "code": "empresarial",
+      "name": "Empresarial",
+      "price": 249,
+      "hours": 15,
+      "preventiveVisits": 2
+    },
+    {
+      "id": 3,
+      "code": "integral",
+      "name": "Integral",
+      "price": 499,
+      "hours": 30,
+      "preventiveVisits": 4
+    }
+  ],
+  "companies": [
+    {
+      "id": 1,
+      "name": "Importaciones Andina SAC",
+      "ruc": "20123456789",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "aaa",
+      "ruc": "12345678941",
+      "createdAt": "2026-10-09T07:02:43.239Z"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Soporte UniLink",
+      "email": "soporte@unilink.pe",
+      "password": "123456",
+      "role": "sysadmin",
+      "companyId": null,
+      "phone": "",
+      "position": "Administrador del Sistema"
+    },
+    {
+      "id": 2,
+      "name": "Carlos Técnico",
+      "email": "tecnico@unilink.pe",
+      "password": "123456",
+      "role": "technician",
+      "companyId": null,
+      "phone": "",
+      "position": "Técnico de Soporte"
+    },
+    {
+      "id": 3,
+      "name": "Ana Administradora",
+      "email": "admin@mype.pe",
+      "password": "123456",
+      "role": "admin",
+      "companyId": 1,
+      "phone": "",
+      "position": "Administrador"
+    },
+    {
+      "id": 4,
+      "name": "Lucía Empleada",
+      "email": "empleada@mype.pe",
+      "password": "123456",
+      "role": "employee",
+      "companyId": 1,
+      "phone": "",
+      "position": "Asistente"
+    },
+    {
+      "id": 5,
+      "name": "aaa",
+      "email": "aa@a",
+      "password": "123456789",
+      "role": "admin",
+      "companyId": 2,
+      "phone": "",
+      "position": "Administrador"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "planId": 2,
+      "planName": "Empresarial",
+      "hoursTotal": 15,
+      "hoursUsed": 0,
+      "preventiveTotal": 2,
+      "preventiveUsed": 0,
+      "startedAt": "2026-10-09T07:01:14.492Z",
+      "renewsAt": "2026-11-09T07:01:14.492Z",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "companyId": 2,
+      "planId": 2,
+      "planName": "Empresarial",
+      "hoursTotal": 15,
+      "hoursUsed": 0,
+      "preventiveTotal": 2,
+      "preventiveUsed": 0,
+      "startedAt": "2026-10-09T07:02:43.240Z",
+      "renewsAt": "2026-11-09T07:02:43.240Z",
+      "status": "active"
+    }
+  ],
+  "locations": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "name": "Sede Central - Lima",
+      "desk": "Escritorio 1",
+      "active": true
+    },
+    {
+      "id": 2,
+      "companyId": 1,
+      "name": "Sede Central - Lima",
+      "desk": "Escritorio 2",
+      "active": true
+    }
+  ],
+  "equipments": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "code": "EQ-0001",
+      "name": "PC Contabilidad",
+      "serialNumber": "SN-1001",
+      "type": "Desktop",
+      "locationId": 1,
+      "assignedTo": 4
+    },
+    {
+      "id": 2,
+      "companyId": 1,
+      "code": "EQ-0002",
+      "name": "Laptop Ventas",
+      "serialNumber": "SN-1002",
+      "type": "Laptop",
+      "locationId": 2,
+      "assignedTo": null
+    }
+  ],
+  "assignments": [],
+  "tickets": [],
+  "quotes": [],
+  "maintenances": [],
+  "notifications": [],
+  "resetTokens": [
+    {
+      "id": 1,
+      "userId": 3,
+      "token": "f30cd5b3be91848bf309ce1e4e1e6b85",
+      "expiresAt": 1791615701231
+    }
+  ]
+}
