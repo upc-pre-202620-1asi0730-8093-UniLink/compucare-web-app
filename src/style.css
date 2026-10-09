@@ -1,0 +1,87 @@
+
+/* CompuCare - Global Styles */
+/* UniLink - Web Application */
+
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #112D35;
+  background-color: #F6F8F7;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  background-color: #F6F8F7;
+}
+
+/* Typography */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+p {
+  margin-top: 0;
+}
+
+/* Form elements */
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Links */
+
+a {
+  color: #087F75;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Accessibility */
+
+:focus-visible {
+  outline: 2px solid #087F75;
+  outline-offset: 3px;
+}

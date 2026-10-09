@@ -1,0 +1,24 @@
+<script setup>
+defineProps({
+  eyebrow: {type: String, default: ''},
+  title: {type: String, required: true},
+  description: {type: String, default: ''}
+})
+</script>
+
+<template>
+  <header class="cc-header">
+    <div class="cc-header-content">
+      <div class="cc-eyebrow">
+        <span class="cc-eyebrow-dot"></span>
+        {{ eyebrow }}
+      </div>
+
+      <h1>{{ title }}</h1>
+
+      <p v-if="description">{{ description }}</p>
+    </div>
+
+    <slot />
+  </header>
+</template>
