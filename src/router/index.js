@@ -1,16 +1,21 @@
 
 import { createRouter, createWebHistory } from 'vue-router'
 import iamRoutes from '../iam/presentation/iam-routes.js'
+import serviceRequestRoutes from '../service-requests/presentation/service-request-routes.js'
 import useIamStore from '../iam/application/iam.store.js'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
+
     routes: [
         {
             path: '/',
             redirect: '/login'
         },
+
         ...iamRoutes,
+        ...serviceRequestRoutes,
+
         {
             path: '/:pathMatch(.*)*',
             redirect: '/login'
@@ -25,12 +30,11 @@ router.beforeEach((to) => {
     const isAuthenticated = iamStore.isAuthenticated
     const userRole = iamStore.role
 
-    // Las páginas públicas pueden visitarse sin sesión.
+    // Permitir el acceso a páginas públicas.
     if (isPublic) {
         if (isAuthenticated && to.path === '/login') {
             const destination = iamStore.homeRoute
 
-            // Mientras no existan los paneles, usar perfil.
             if (
                 destination !== to.path &&
                 router.resolve(destination).matched.some(
@@ -46,15 +50,17 @@ router.beforeEach((to) => {
         return true
     }
 
-    // Exigir inicio de sesión para las páginas privadas.
+    // Exigir autenticación para las páginas privadas.
     if (!isAuthenticated) {
         return {
             path: '/login',
-            query: { redirect: to.fullPath }
+            query: {
+                redirect: to.fullPath
+            }
         }
     }
 
-    // Comprobar permisos según el rol del usuario.
+    // Verificar que el usuario tenga el rol autorizado.
     const allowedRoles = to.meta.roles
 
     if (
