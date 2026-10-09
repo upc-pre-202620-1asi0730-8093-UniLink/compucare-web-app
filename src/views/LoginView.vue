@@ -1,4 +1,5 @@
-<script setup lang="ts">
+
+<script setup>
 import { ref } from 'vue'
 
 const email = ref('')
@@ -7,28 +8,33 @@ const message = ref('')
 
 function handleLogin() {
   message.value =
-      'El inicio de sesión estará disponible próximamente.'
+      'El inicio de sesión estará disponible cuando configuremos la autenticación.'
 }
 </script>
 
 <template>
   <main class="login-page">
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
-    <div class="bg-shape bg-shape-4"></div>
 
-    <div class="bg-ring bg-ring-1"></div>
-    <div class="bg-ring bg-ring-2"></div>
+    <!-- Decoraciones exteriores -->
+    <div class="bg-shape bg-shape-1" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-2" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-3" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-4" aria-hidden="true"></div>
 
-    <div class="bg-bar bg-bar-1"></div>
-    <div class="bg-bar bg-bar-2"></div>
-    <div class="bg-bar bg-bar-3"></div>
+    <div class="bg-ring bg-ring-1" aria-hidden="true"></div>
+    <div class="bg-ring bg-ring-2" aria-hidden="true"></div>
 
-    <div class="bg-dots bg-dots-1"></div>
-    <div class="bg-dots bg-dots-2"></div>
+    <div class="bg-bar bg-bar-1" aria-hidden="true"></div>
+    <div class="bg-bar bg-bar-2" aria-hidden="true"></div>
+    <div class="bg-bar bg-bar-3" aria-hidden="true"></div>
 
+    <div class="bg-dots bg-dots-1" aria-hidden="true"></div>
+    <div class="bg-dots bg-dots-2" aria-hidden="true"></div>
+
+    <!-- Tarjeta principal -->
     <section class="login-card">
+
+      <!-- Panel izquierdo -->
       <div class="brand-panel">
         <div class="brand-name">
           CompuCare<span>.</span>
@@ -45,11 +51,13 @@ function handleLogin() {
         <p class="brand-footer">Powered by UniLink</p>
       </div>
 
+      <!-- Panel derecho -->
       <div class="form-panel">
-        <div class="form-decoration form-decoration-one"></div>
-        <div class="form-decoration form-decoration-two"></div>
-        <div class="form-decoration form-decoration-three"></div>
-        <div class="form-grid"></div>
+
+        <div class="form-decoration form-decoration-one" aria-hidden="true"></div>
+        <div class="form-decoration form-decoration-two" aria-hidden="true"></div>
+        <div class="form-decoration form-decoration-three" aria-hidden="true"></div>
+        <div class="form-grid" aria-hidden="true"></div>
 
         <div class="form-content">
           <h2>Bienvenido de nuevo</h2>
@@ -98,6 +106,7 @@ function handleLogin() {
           </p>
         </div>
       </div>
+
     </section>
   </main>
 </template>
@@ -110,7 +119,6 @@ function handleLogin() {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  box-sizing: border-box;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
   background:
@@ -119,7 +127,7 @@ function handleLogin() {
       linear-gradient(135deg, #edf5f3 0%, #f6f8f7 45%, #eaf3f1 100%);
 }
 
-/* DECORACIONES EXTERNAS GRANDES */
+/* Decoraciones exteriores */
 
 .bg-shape,
 .bg-ring,
@@ -223,7 +231,10 @@ function handleLogin() {
 .bg-dots {
   width: 150px;
   height: 150px;
-  background-image: radial-gradient(rgba(8, 127, 117, 0.36) 2px, transparent 2px);
+  background-image: radial-gradient(
+      rgba(8, 127, 117, 0.36) 2px,
+      transparent 2px
+  );
   background-size: 18px 18px;
   opacity: 0.95;
   z-index: 0;
@@ -239,7 +250,7 @@ function handleLogin() {
   top: 100px;
 }
 
-/* TARJETA */
+/* Tarjeta principal */
 
 .login-card {
   position: relative;
@@ -254,6 +265,8 @@ function handleLogin() {
   overflow: hidden;
   box-shadow: 0 20px 55px rgba(17, 45, 53, 0.16);
 }
+
+/* Panel izquierdo */
 
 .brand-panel {
   background: linear-gradient(160deg, #112d35 0%, #0d3841 100%);
@@ -289,7 +302,7 @@ function handleLogin() {
   opacity: 0.7;
 }
 
-/* PANEL DERECHO */
+/* Panel derecho */
 
 .form-panel {
   position: relative;
@@ -337,7 +350,10 @@ function handleLogin() {
   bottom: 42px;
   width: 88px;
   height: 88px;
-  background-image: radial-gradient(rgba(8, 127, 117, 0.18) 1.4px, transparent 1.4px);
+  background-image: radial-gradient(
+      rgba(8, 127, 117, 0.18) 1.4px,
+      transparent 1.4px
+  );
   background-size: 14px 14px;
   pointer-events: none;
 }
@@ -373,7 +389,6 @@ function handleLogin() {
 }
 
 .field input {
-  box-sizing: border-box;
   width: 100%;
   padding: 14px;
   border: 1px solid #d5dfdd;
@@ -418,17 +433,21 @@ function handleLogin() {
   text-align: center;
 }
 
+/* Adaptación a pantallas pequeñas */
+
 @media (max-width: 1100px) {
-  .bg-bar-1,
-  .bg-bar-2,
-  .bg-bar-3,
-  .bg-dots-1,
-  .bg-dots-2 {
+  .bg-bar,
+  .bg-dots {
     opacity: 0.65;
   }
 }
 
 @media (max-width: 700px) {
+  .login-page {
+    padding: 16px;
+    overflow-y: auto;
+  }
+
   .login-card {
     grid-template-columns: 1fr;
   }
@@ -450,8 +469,6 @@ function handleLogin() {
   .form-decoration-one {
     width: 120px;
     height: 120px;
-    top: -25px;
-    right: -25px;
   }
 
   .form-decoration-two {
@@ -481,10 +498,7 @@ function handleLogin() {
     display: none;
   }
 
-  .bg-shape-1,
-  .bg-shape-2,
-  .bg-shape-3,
-  .bg-shape-4 {
+  .bg-shape {
     transform: scale(0.75);
   }
 }
