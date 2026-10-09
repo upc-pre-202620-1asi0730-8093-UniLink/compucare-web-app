@@ -1,5 +1,6 @@
 
 import { createRouter, createWebHistory } from 'vue-router'
+import iamRoutes from '../iam/presentation/iam-routes.js'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,14 +8,14 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            redirect: '/login',
+            redirect: '/login'
         },
+        ...iamRoutes,
         {
-            path: '/login',
-            name: 'login',
-            component: () => import('../views/LoginView.vue'),
-        },
-    ],
+            path: '/:pathMatch(.*)*',
+            redirect: '/login'
+        }
+    ]
 })
 
 export default router
