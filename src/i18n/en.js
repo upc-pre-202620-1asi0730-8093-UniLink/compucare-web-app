@@ -1,0 +1,75 @@
+
+export default {
+    common: {
+        appName: 'CompuCare',
+        welcome: 'Welcome',
+        save: 'Save',
+        cancel: 'Cancel',
+        close: 'Close',
+        search: 'Search',
+        edit: 'Edit',
+        delete: 'Delete',
+        confirm: 'Confirm',
+        loading: 'Loading...',
+        actions: 'Actions',
+        status: 'Status',
+        description: 'Description',
+        back: 'Back',
+        send: 'Send',
+        language: 'Language'
+    },
+    navigation: {
+        mainMenu: 'MAIN MENU',
+        myRequests: 'My requests',
+        myEquipment: 'My equipment',
+        myAssignments: 'My assignments',
+        quotations: 'Quotations',
+        ticketManagement: 'Ticket management',
+        dashboard: 'Dashboard',
+        equipment: 'Equipment',
+        locations: 'Locations',
+        subscription: 'Subscription',
+        maintenance: 'Maintenance',
+        employees: 'Employees',
+        myProfile: 'My profile',
+        logout: 'Sign out'
+    },
+    roles: {
+        employee: 'Employee',
+        technician: 'Technician',
+        admin: 'Company manager',
+        sysadmin: 'UniLink administrator',
+        user: 'User'
+    },
+    auth: {
+        slogan: 'Your technology, in good hands.',
+        sloganDescription: 'Manage maintenance and technical support for your company’s devices in one place.',
+        welcomeBack: 'Welcome back',
+        loginDescription: 'Enter your credentials to access CompuCare.',
+        email: 'Email address',
+        password: 'Password',
+        passwordPlaceholder: 'Enter your password',
+        login: 'Sign in',
+        loggingIn: 'Signing in...',
+        forgotPassword: 'Forgot your password?',
+        registerCompany: 'Register company',
+        needHelp: 'Need help signing in?',
+        contactAdmin: 'Contact your company administrator.'
+    },
+    tickets: {
+        myTickets: 'My requests',
+        manageTickets: 'Ticket management',
+        assignments: 'My assignments',
+        createTicket: 'New request',
+        assigned: 'Assigned',
+        pending: 'Pending assignment',
+        inDiagnosis: 'Under diagnosis',
+        completed: 'Completed',
+        canceled: 'Canceled',
+        startDiagnosis: 'Start diagnosis',
+        sendQuotation: 'Send quotation',
+        technicalReport: 'Technical report',
+        workDone: 'Work performed',
+        hoursUsed: 'Hours worked'
+    }
+}
