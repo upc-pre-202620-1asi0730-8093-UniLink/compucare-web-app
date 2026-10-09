@@ -1,28 +1,24 @@
 {
-  "name": "unilink",
+  "name": "compucare-webapp",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.0",
   "type": "module",
-  "description": "UniLink: plataforma de soporte técnico por suscripción para MYPE. Vue 3, Vite, Pinia, PrimeVue y Axios, con API simulada en json-server.",
   "scripts": {
     "dev": "vite",
-    "api": "node server/server.js",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@primeuix/themes": "^3.0.1",
     "axios": "^1.20.0",
+    "json-server": "^0.17.4",
     "pinia": "^4.0.3",
-    "primeflex": "^4.0.0",
-    "primeicons": "^8.0.2",
-    "primevue": "^5.0.2",
+    "primevue": "^4.5.5",
     "vue": "^3.5.42",
-    "vue-router": "^5.3.1"
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.8",
-    "json-server": "^0.17.4",
     "vite": "^8.3.0"
   }
 }
