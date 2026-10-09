@@ -5,12 +5,15 @@ import crypto from 'crypto';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// import.meta.url queda vacío cuando la Netlify Function se empaqueta como CommonJS.
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : process.cwd();
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.JWT_SECRET || 'unilink-dev-secret';
 
+// `source` puede ser la ruta a db.json (local) o un objeto en memoria (Netlify Function).
+export function createApp(source = path.join(__dirname, 'db.json')) {
 const server = jsonServer.create();
-const router = jsonServer.router(path.join(__dirname, 'db.json'));
+const router = jsonServer.router(source);
 const db = router.db;
 
 // ---------- helpers ----------
@@ -47,6 +50,8 @@ const verify = (token) => {
 // ---------- middlewares base ----------
 server.use(jsonServer.defaults());
 server.use(jsonServer.bodyParser);
+// En Netlify la petición puede llegar como /.netlify/functions/api/...; se normaliza a /api/v1/...
+server.use((req, res, next) => { req.url = req.url.replace(/^\/\.netlify\/functions\/api/, '/api/v1'); next(); });
 server.use(jsonServer.rewriter({'/api/v1/*': '/$1'}));
 
 server.use((req, res, next) => {
@@ -399,4 +404,10 @@ server.use((req, res, next) => {
   return req.method === 'GET' && ['plans', 'companies'].includes(resource) ? next() : bad(res, 'Operación no permitida', 403);
 });
 server.use(router);
-server.listen(PORT, () => console.log(`UniLink API en http://localhost:${PORT}/api/v1`));
+return {server, db};
+}
+
+// Ejecución local: `npm run api`
+if (import.meta.url && process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  createApp().server.listen(PORT, () => console.log(`UniLink API en http://localhost:${PORT}/api/v1`));
+}

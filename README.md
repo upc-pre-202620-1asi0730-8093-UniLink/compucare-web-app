@@ -13,6 +13,9 @@ npm run api
 npm run dev
 ```
 
+En Netlify, `server/server.js` corre como la función `netlify/functions/api.mjs` en `/api/v1/*`.
+Los datos se guardan en Netlify Blobs (`db.json` se usa solo como datos iniciales).
+
 Pega tu licencia de PrimeUI en `.env.development` (`VITE_PRIME_UI_LICENSE_KEY`), igual que en learning-center.
 
 ## Usuarios de prueba (clave `123456`)

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const platformApi = import.meta.env.VITE_UNILINK_API_URL;
+const platformApi = import.meta.env.VITE_UNILINK_API_URL || '/api/v1';
 
 export class BaseApi {
     #http;

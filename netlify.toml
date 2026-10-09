@@ -1,0 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["json-server"]
+
+# Backend: server/server.js corre como la función netlify/functions/api.mjs
+[[redirects]]
+  from = "/api/v1/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# SPA: cualquier ruta del cliente (p. ej. /dashboard, /admin/tickets) sirve index.html
+# para que vue-router la resuelva al recargar o abrir un enlace directo.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
