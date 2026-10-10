@@ -71,5 +71,12 @@ export default {
         technicalReport: 'Technical report',
         workDone: 'Work performed',
         hoursUsed: 'Hours worked'
+    },
+    equipment: {
+        title: 'Equipment Management',
+        newEquipment: 'New Equipment',
+        name: 'Equipment Name',
+        model: 'Model',
+        serialNumber: 'Serial Number'
     }
 }
