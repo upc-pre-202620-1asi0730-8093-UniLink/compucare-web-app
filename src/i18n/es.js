@@ -71,5 +71,12 @@ export default {
         technicalReport: 'Informe técnico',
         workDone: 'Trabajo realizado',
         hoursUsed: 'Horas empleadas'
+    },
+    equipment: {
+        title: 'Gestión de Equipos',
+        newEquipment: 'Nuevo Equipo',
+        name: 'Nombre del Equipo',
+        model: 'Modelo',
+        serialNumber: 'Número de Serie'
     }
 }
