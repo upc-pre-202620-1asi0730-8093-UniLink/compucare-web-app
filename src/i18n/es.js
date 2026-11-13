@@ -19,7 +19,10 @@ export default {
         language: 'Idioma',
         refresh: 'Actualizar',
         refreshing: 'Actualizando...',
-        unresolvedQuotation: 'La solicitud tiene una cotización pendiente o rechazada. Resuélvela antes de cerrar el ticket.'
+        unresolvedQuotation: 'La solicitud tiene una cotización pendiente o rechazada. Resuélvela antes de cerrar el ticket.',
+        invalidDemoPayment: "Ingresa un titular de prueba y exactamente cuatro dígitos de una tarjeta ficticia.",
+        demoPaymentNote: "Pago simulado de",
+        testCardLast4: "Últimos cuatro dígitos de tarjeta de prueba"
     },
     navigation: {
         mainMenu: 'MENÚ PRINCIPAL',
