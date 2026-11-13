@@ -3,6 +3,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import useTicketStore from '../../application/ticket.store.js'
 import useIamStore from '../../../iam/application/iam.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
@@ -11,6 +12,7 @@ const store = useTicketStore()
 const iam = useIamStore()
 const { ok, fail } = useFeedback()
 const { t } = useI18n({ useScope: 'global' })
+const { ticketStatusLabel, categoryLabel } = useDomainLabels()
 const { refresh, refreshing } = useAutoRefresh(() => store.fetchTickets())
 
 const chosen = ref({})
@@ -242,7 +244,7 @@ function statusClass(status) {
                   :key="status"
                   :value="status"
               >
-                {{ status }}
+                {{ status === 'Todos' ? t('domain.allStatuses') : ticketStatusLabel(status) }}
               </option>
             </select>
           </div>
@@ -315,7 +317,7 @@ function statusClass(status) {
               </td>
 
               <td>
-                {{ ticket.category || 'Sin categoría' }}
+                {{ categoryLabel(ticket.category) }}
               </td>
 
               <td>
@@ -323,7 +325,7 @@ function statusClass(status) {
                       class="status-badge"
                       :class="statusClass(ticket.status)"
                   >
-                    {{ ticket.status || 'Sin estado' }}
+                    {{ ticketStatusLabel(ticket.status) }}
                   </span>
               </td>
 
