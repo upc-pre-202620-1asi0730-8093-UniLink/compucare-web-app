@@ -1,5 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import { computed, onMounted, ref } from 'vue'
 import useEquipmentStore from '../../application/equipment.store.js'
 import useIamStore from '../../../iam/application/iam.store.js'
@@ -12,6 +13,7 @@ const store = useEquipmentStore()
 const iam = useIamStore()
 const { ok, fail } = useFeedback()
 const { t } = useI18n({ useScope: 'global' })
+const { equipmentStatusLabel, ticketStatusLabel, categoryLabel } = useDomainLabels()
 
 const types = ['Desktop', 'Laptop', 'Impresora', 'Servidor', 'Red', 'Otro']
 const statuses = ['Operativo', 'En Reparación']
@@ -88,12 +90,12 @@ onMounted(async () => {
 
 function locationLabel(id) {
   const location = store.locations.find(l => l.id === id)
-  return location ? `${location.name} · ${location.desk}` : 'Sin sede'
+  return location ? `${location.name} · ${location.desk}` : t('screens.equipments.siteFallback')
 }
 
 function employeeName(id) {
   if (!id) return null
-  return iam.employees.find(e => e.id === id)?.name ?? (id === iam.user?.id ? iam.user.name : `Empleado #${id}`)
+  return iam.employees.find(e => e.id === id)?.name ?? (id === iam.user?.id ? iam.user.name : `${t('screens.equipments.s26')} #${id}`)
 }
 
 function statusClass(status) {
@@ -120,7 +122,7 @@ async function saveEquipment() {
       locationId: form.value.locationId || null
     })
 
-    ok('Equipo registrado correctamente')
+    ok(t('screens.equipments.registered'))
     createVisible.value = false
   } catch (error) {
     fail(error)
@@ -142,7 +144,7 @@ async function saveAssignment(employeeId) {
 
   try {
     await store.assignEquipment(selected.value.id, employeeId)
-    ok(employeeId ? 'Equipo asignado correctamente' : 'Asignación retirada')
+    ok(t(employeeId ? 'screens.equipments.assigned' : 'screens.equipments.unassigned'))
     assignVisible.value = false
   } catch (error) {
     fail(error)
@@ -170,11 +172,9 @@ async function openHistory(item) {
     <div class="cc-container">
 
       <PageHeader
-          :eyebrow="isAdmin ? 'INVENTARIO' : 'MIS EQUIPOS'"
-          :title="isAdmin ? 'Equipos' : 'Mis equipos'"
-          :description="isAdmin
-            ? 'Registra los equipos de tu empresa, asígnalos a tu personal y consulta su historial de soporte.'
-            : 'Consulta los equipos que tienes asignados y su estado actual.'"
+          :eyebrow="isAdmin ? t('screens.equipments.adminEyebrow') : t('screens.equipments.employeeEyebrow')"
+          :title="isAdmin ? t('screens.equipments.adminTitle') : t('screens.equipments.employeeTitle')"
+          :description="isAdmin ? t('screens.equipments.adminDescription') : t('screens.equipments.employeeDescription')"
       >
         <button
             v-if="isAdmin"
@@ -217,12 +217,12 @@ async function openHistory(item) {
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ isAdmin ? 'Sin asignar' : 'Asignados a mí' }}</span>
+            <span>{{ t(isAdmin ? 'screens.equipments.unassignedCount' : 'screens.equipments.mineCount') }}</span>
             <span class="cc-stat-icon cc-icon-active"><i class="pi pi-user"></i></span>
           </div>
           <strong>{{ isAdmin ? unassignedCount : equipments.length }}</strong>
           <span class="cc-stat-caption">
-            {{ isAdmin ? 'Disponibles para asignar' : 'Bajo tu responsabilidad' }}
+            {{ t(isAdmin ? 'screens.equipments.unassignedCaption' : 'screens.equipments.mineCaption') }}
           </span>
         </article>
       </section>
@@ -299,9 +299,7 @@ async function openHistory(item) {
                   <i class="pi pi-desktop"></i>
                   <strong>{{ t('screens.equipments.s18') }}</strong>
                   <span>
-                    {{ isAdmin
-                      ? 'Registra un equipo o ajusta los filtros de búsqueda.'
-                      : 'Cuando te asignen un equipo, aparecerá aquí.' }}
+                    {{ t(isAdmin ? 'screens.equipments.noEquipmentAdmin' : 'screens.equipments.noEquipmentEmployee') }}
                   </span>
                 </div>
               </td>
@@ -334,7 +332,7 @@ async function openHistory(item) {
 
               <td>
                 <span class="cc-badge" :class="statusClass(item.status)">
-                  {{ item.status }}
+                  {{ equipmentStatusLabel(item.status) }}
                 </span>
               </td>
 
@@ -344,7 +342,7 @@ async function openHistory(item) {
                       class="cc-icon-btn"
                       type="button"
                       :title="t('screens.equipments.s38')"
-                      :aria-label="`Asignar ${item.name}`"
+                      :aria-label="t('screens.equipments.assignAria', { name: item.name })"
                       @click="openAssign(item)"
                   >
                     <i class="pi pi-user-edit"></i>
@@ -354,7 +352,7 @@ async function openHistory(item) {
                       class="cc-icon-btn"
                       type="button"
                       :title="t('screens.equipments.s39')"
-                      :aria-label="`Ver historial de ${item.name}`"
+                      :aria-label="t('screens.equipments.historyAria', { name: item.name })"
                       @click="openHistory(item)"
                   >
                     <i class="pi pi-history"></i>
@@ -367,7 +365,7 @@ async function openHistory(item) {
         </div>
 
         <div class="cc-table-footer">
-          Mostrando {{ filteredEquipments.length }} de {{ equipments.length }} equipos
+          {{ t('screens.equipments.showing', { shown: filteredEquipments.length, total: equipments.length }) }}
         </div>
       </section>
 
@@ -446,7 +444,7 @@ async function openHistory(item) {
               :disabled="saving || !form.type"
           >
             <i class="pi pi-save"></i>
-            {{ saving ? 'Guardando...' : 'Guardar equipo' }}
+            {{ saving ? t('screens.equipments.saving') : t('screens.equipments.saveEquipment') }}
           </button>
         </div>
       </form>
@@ -455,7 +453,7 @@ async function openHistory(item) {
     <!-- Asignar equipo -->
     <pv-dialog
         v-model:visible="assignVisible"
-        :header="`Asignar ${selected?.name ?? 'equipo'}`"
+        :header="t('screens.equipments.assignTitle', { name: selected?.name ?? t('screens.equipments.deviceFallback') })"
         modal
         :style="{ width: 'min(460px, 94vw)' }"
     >
@@ -496,7 +494,7 @@ async function openHistory(item) {
 
           <button class="cc-primary-btn" type="submit" :disabled="saving || !assignee">
             <i class="pi pi-check"></i>
-            {{ saving ? 'Guardando...' : 'Asignar' }}
+            {{ saving ? t('screens.equipments.saving') : t('screens.equipments.assign') }}
           </button>
         </div>
       </form>
@@ -505,7 +503,7 @@ async function openHistory(item) {
     <!-- Historial del equipo -->
     <pv-dialog
         v-model:visible="historyVisible"
-        :header="`Historial de ${selected?.name ?? 'equipo'}`"
+        :header="t('screens.equipments.historyTitle', { name: selected?.name ?? t('screens.equipments.deviceFallback') })"
         modal
         :style="{ width: 'min(560px, 94vw)' }"
     >
@@ -527,7 +525,7 @@ async function openHistory(item) {
             >
               <span class="cc-timeline-dot"></span>
               <div class="cc-timeline-details">
-                <strong>{{ item.employeeId ? `Asignado a ${employeeName(item.employeeId)}` : 'Asignación retirada' }}</strong>
+                <strong>{{ item.employeeId ? t('screens.equipments.assignedTo', { name: employeeName(item.employeeId) }) : t('screens.equipments.removedAssignment') }}</strong>
                 <small>{{ formatDate(item.at) }}</small>
               </div>
             </div>
@@ -549,10 +547,10 @@ async function openHistory(item) {
             >
               <span class="cc-timeline-dot"></span>
               <div class="cc-timeline-details">
-                <strong>#{{ ticket.id }} · {{ ticket.category }} · {{ ticket.status }}</strong>
+                <strong>#{{ ticket.id }} · {{ categoryLabel(ticket.category) }} · {{ ticketStatusLabel(ticket.status) }}</strong>
                 <small>{{ ticket.description }}</small>
                 <small v-if="ticket.quotes?.length">
-                  {{ ticket.quotes.length }} cotización(es) asociada(s)
+                  {{ t('screens.equipments.quotesAssociated', { count: ticket.quotes.length }) }}
                 </small>
               </div>
             </div>
