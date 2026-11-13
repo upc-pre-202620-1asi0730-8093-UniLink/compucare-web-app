@@ -1,4 +1,4 @@
-// EN copy for CompuCare frontend screens.
+// UI copy for CompuCare, locale en.
 export default {
   "myTickets": {
     "s0": "SUPPORT CENTER",
@@ -436,7 +436,8 @@ export default {
     "create": "Register and invite",
     "count": "{count} employees in your company.",
     "inviteNote": "An invitation with a temporary password will be sent to the employee's email (simulated in the demo).",
-    "demoToken": "Temporary password (development only):"
+    "demoToken": "Temporary password (development only):",
+    "showing": "Showing {shown} of {total} employees"
   },
   "profile": {
     "s0": "Email address",
