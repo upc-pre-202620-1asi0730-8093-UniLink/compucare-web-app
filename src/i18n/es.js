@@ -16,7 +16,10 @@ export default {
         description: 'Descripción',
         back: 'Volver',
         send: 'Enviar',
-        language: 'Idioma'
+        language: 'Idioma',
+        refresh: 'Actualizar',
+        refreshing: 'Actualizando...',
+        unresolvedQuotation: 'La solicitud tiene una cotización pendiente o rechazada. Resuélvela antes de cerrar el ticket.'
     },
     navigation: {
         mainMenu: 'MENÚ PRINCIPAL',
