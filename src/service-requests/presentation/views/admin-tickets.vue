@@ -1,6 +1,9 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import useTicketStore from '../../application/ticket.store.js'
 import useIamStore from '../../../iam/application/iam.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
@@ -8,6 +11,9 @@ import { useFeedback } from '../../../shared/presentation/use-feedback.js'
 const store = useTicketStore()
 const iam = useIamStore()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
+const { ticketStatusLabel, categoryLabel } = useDomainLabels()
+const { refresh, refreshing } = useAutoRefresh(() => store.fetchTickets())
 
 const chosen = ref({})
 const assigning = ref({})
@@ -70,6 +76,7 @@ const activeCount = computed(() =>
 const completedCount = computed(() =>
     tickets.value.filter(ticket =>
         [
+          'Atendido',
           'Resuelto',
           'Completado',
           'Cerrado'
@@ -101,7 +108,7 @@ async function assign(ticket) {
 
   try {
     await store.assignTicket(ticket.id, technicianId)
-    ok('Técnico asignado y notificado correctamente')
+    ok(t('screens.adminTickets.assignedSuccess'))
   } catch (error) {
     fail(error)
   } finally {
@@ -116,6 +123,7 @@ function statusClass(status) {
   if (value.includes('asignado')) return 'status-assigned'
   if (value.includes('diagnóstico')) return 'status-progress'
   if (value.includes('proceso')) return 'status-progress'
+  if (value.includes('atendido')) return 'status-completed'
   if (value.includes('resuelto')) return 'status-completed'
   if (value.includes('completado')) return 'status-completed'
   if (value.includes('cerrado')) return 'status-completed'
@@ -133,78 +141,83 @@ function statusClass(status) {
         <div class="header-content">
           <div class="eyebrow">
             <span class="eyebrow-dot"></span>
-            ADMINISTRACIÓN DE SOPORTE
+            {{ t('screens.adminTickets.s0') }}
           </div>
 
-          <h1>Solicitudes de soporte</h1>
+          <h1>{{ t('screens.adminTickets.s1') }}</h1>
 
           <p>
-            Supervisa las incidencias reportadas, consulta su estado
-            y asigna técnicos para brindar atención oportuna.
+            {{ t('screens.adminTickets.s2') }}
           </p>
         </div>
 
-        <div class="header-icon" aria-hidden="true">
-          <i class="pi pi-clipboard"></i>
-        </div>
+        <button
+            type="button"
+            class="assign-button"
+            :disabled="refreshing"
+            @click="refresh().catch(fail)"
+        >
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ refreshing ? t('common.refreshing') : t('common.refresh') }}
+        </button>
       </header>
 
-      <section class="stats-grid" aria-label="Resumen de solicitudes">
+      <section class="stats-grid" :aria-label="t('screens.adminTickets.s23')">
         <article class="stat-card">
           <div class="stat-top">
-            <span>Total de solicitudes</span>
+            <span>{{ t('screens.adminTickets.s3') }}</span>
             <span class="stat-icon">
               <i class="pi pi-list"></i>
             </span>
           </div>
 
           <strong>{{ tickets.length }}</strong>
-          <span class="stat-caption">Tickets registrados</span>
+          <span class="stat-caption">{{ t('screens.adminTickets.s4') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>Por asignar</span>
+            <span>{{ t('screens.adminTickets.s5') }}</span>
             <span class="stat-icon pending-icon">
               <i class="pi pi-clock"></i>
             </span>
           </div>
 
           <strong>{{ pendingCount }}</strong>
-          <span class="stat-caption">Requieren un técnico</span>
+          <span class="stat-caption">{{ t('screens.adminTickets.s6') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>En atención</span>
+            <span>{{ t('screens.adminTickets.s7') }}</span>
             <span class="stat-icon active-icon">
               <i class="pi pi-cog"></i>
             </span>
           </div>
 
           <strong>{{ activeCount }}</strong>
-          <span class="stat-caption">Casos en seguimiento</span>
+          <span class="stat-caption">{{ t('screens.adminTickets.s8') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>Finalizadas</span>
+            <span>{{ t('screens.adminTickets.s9') }}</span>
             <span class="stat-icon completed-icon">
               <i class="pi pi-check-circle"></i>
             </span>
           </div>
 
           <strong>{{ completedCount }}</strong>
-          <span class="stat-caption">Casos completados</span>
+          <span class="stat-caption">{{ t('screens.adminTickets.s10') }}</span>
         </article>
       </section>
 
       <section class="tickets-card">
         <div class="section-heading">
           <div>
-            <h2>Gestión de solicitudes</h2>
+            <h2>{{ t('screens.adminTickets.s11') }}</h2>
             <p>
-              Consulta los tickets y administra las asignaciones.
+              {{ t('screens.adminTickets.s12') }}
             </p>
           </div>
 
@@ -215,22 +228,22 @@ function statusClass(status) {
               <input
                   v-model="search"
                   type="search"
-                  placeholder="Buscar solicitud..."
-                  aria-label="Buscar solicitudes"
+                  :placeholder="t('screens.adminTickets.s24')"
+                  :aria-label="t('screens.adminTickets.s25')"
               />
             </div>
 
             <select
                 v-model="statusFilter"
                 class="status-filter"
-                aria-label="Filtrar por estado"
+                :aria-label="t('screens.adminTickets.s26')"
             >
               <option
                   v-for="status in statusOptions"
                   :key="status"
                   :value="status"
               >
-                {{ status }}
+                {{ status === 'Todos' ? t('domain.allStatuses') : ticketStatusLabel(status) }}
               </option>
             </select>
           </div>
@@ -240,19 +253,19 @@ function statusClass(status) {
           <table class="tickets-table">
             <thead>
             <tr>
-              <th>Ticket</th>
-              <th>Solicitante</th>
-              <th>Equipo</th>
-              <th>Categoría</th>
-              <th>Estado</th>
-              <th>Técnico asignado</th>
+              <th>{{ t('screens.adminTickets.s13') }}</th>
+              <th>{{ t('screens.adminTickets.s14') }}</th>
+              <th>{{ t('screens.adminTickets.s15') }}</th>
+              <th>{{ t('screens.adminTickets.s16') }}</th>
+              <th>{{ t('screens.adminTickets.s17') }}</th>
+              <th>{{ t('screens.adminTickets.s18') }}</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
               <td colspan="6" class="empty-cell">
-                Cargando solicitudes...
+                {{ t('screens.adminTickets.s19') }}
               </td>
             </tr>
 
@@ -260,9 +273,9 @@ function statusClass(status) {
               <td colspan="6" class="empty-cell">
                 <div class="empty-state">
                   <i class="pi pi-inbox"></i>
-                  <strong>No hay solicitudes para mostrar</strong>
+                  <strong>{{ t('screens.adminTickets.s20') }}</strong>
                   <span>
-                      Prueba con otro filtro o término de búsqueda.
+                      {{ t('screens.adminTickets.s21') }}
                     </span>
                 </div>
               </td>
@@ -290,7 +303,7 @@ function statusClass(status) {
                     </span>
 
                   <span>
-                      {{ ticket.employeeName || 'Usuario' }}
+                      {{ ticket.employeeName || t('screens.adminTickets.unknownUser') }}
                     </span>
                 </div>
               </td>
@@ -298,12 +311,12 @@ function statusClass(status) {
               <td>
                 <div class="equipment-cell">
                   <i class="pi pi-desktop"></i>
-                  {{ ticket.equipmentName || 'Sin identificar' }}
+                  {{ ticket.equipmentName || t('screens.adminTickets.unknownEquipment') }}
                 </div>
               </td>
 
               <td>
-                {{ ticket.category || 'Sin categoría' }}
+                {{ categoryLabel(ticket.category) }}
               </td>
 
               <td>
@@ -311,7 +324,7 @@ function statusClass(status) {
                       class="status-badge"
                       :class="statusClass(ticket.status)"
                   >
-                    {{ ticket.status || 'Sin estado' }}
+                    {{ ticketStatusLabel(ticket.status) }}
                   </span>
               </td>
 
@@ -323,10 +336,10 @@ function statusClass(status) {
                   <select
                       v-model="chosen[ticket.id]"
                       class="technician-select"
-                      :aria-label="`Seleccionar técnico para ticket ${ticket.id}`"
+                      :aria-label="t('screens.adminTickets.selectAria', { id: ticket.id })"
                   >
                     <option :value="undefined" disabled>
-                      Seleccionar técnico
+                      {{ t('screens.adminTickets.s22') }}
                     </option>
 
                     <option
@@ -348,7 +361,7 @@ function statusClass(status) {
                       @click="assign(ticket)"
                   >
                     <i class="pi pi-check"></i>
-                    {{ assigning[ticket.id] ? 'Asignando...' : 'Asignar' }}
+                    {{ assigning[ticket.id] ? t('screens.adminTickets.assigning') : t('screens.adminTickets.assign') }}
                   </button>
                 </div>
 
@@ -356,7 +369,7 @@ function statusClass(status) {
                   <i class="pi pi-user"></i>
 
                   <span>
-                      {{ ticket.technicianName || 'Sin asignar' }}
+                      {{ ticket.technicianName || t('screens.adminTickets.unassigned') }}
                     </span>
                 </div>
               </td>
@@ -367,12 +380,11 @@ function statusClass(status) {
 
         <div class="table-footer">
           <span>
-            Mostrando {{ filteredTickets.length }} de
-            {{ tickets.length }} solicitudes
+            {{ t('screens.adminTickets.showing', { shown: filteredTickets.length, total: tickets.length }) }}
           </span>
 
           <span>
-            {{ iam.technicians.length }} técnicos disponibles en el sistema
+            {{ t('screens.adminTickets.technicians', { count: iam.technicians.length }) }}
           </span>
         </div>
       </section>

@@ -17,7 +17,7 @@ const showSidebar = computed(() =>
 )
 
 const userName = computed(() =>
-    iamStore.user?.name || 'Usuario CompuCare'
+    iamStore.user?.name || t('navigation.userFallback')
 )
 
 const userRole = computed(() => iamStore.role)
@@ -78,7 +78,9 @@ function logout() {
       <button
           class="mobile-menu-button"
           type="button"
-          aria-label="Abrir menú de navegación"
+          :aria-label="t('navigation.openMenu')"
+          :aria-expanded="menuOpen"
+          aria-controls="app-navigation"
           @click="menuOpen = true"
       >
         <i class="pi pi-bars"></i>
@@ -88,11 +90,14 @@ function logout() {
           v-if="menuOpen"
           class="sidebar-overlay"
           @click="menuOpen = false"
+          aria-hidden="true"
       ></div>
 
       <aside
+          id="app-navigation"
           class="sidebar"
           :class="{ 'sidebar-open': menuOpen }"
+          @keydown.esc="menuOpen = false"
       >
         <div class="sidebar-top">
           <div class="sidebar-brand">
@@ -113,7 +118,7 @@ function logout() {
           <button
               class="sidebar-close"
               type="button"
-              aria-label="Cerrar menú"
+              :aria-label="t('navigation.closeMenu')"
               @click="menuOpen = false"
           >
             <i class="pi pi-times"></i>
@@ -135,6 +140,7 @@ function logout() {
               :class="{
               'navigation-active': route.path === item.path
             }"
+              :aria-current="route.path === item.path ? 'page' : undefined"
               @click="navigate(item.path)"
           >
             <i :class="item.icon"></i>

@@ -51,7 +51,7 @@ Accede a la URL local que indique Vite (normalmente `http://localhost:5173`).
 
 ## Usuarios de demostración
 
-**Contraseña común de prueba: `123456`.**
+Estas cuentas existen únicamente si se activa explícitamente el *seed* de desarrollo del backend C# con `DemoSeed__Enabled=true` y una contraseña privada `DemoSeed__Password` de **12 caracteres o más**. No deben exponerse credenciales reales en GitHub.
 
 | Rol | Correo | Ruta inicial |
 | --- | --- | --- |
@@ -59,6 +59,24 @@ Accede a la URL local que indique Vite (normalmente `http://localhost:5173`).
 | Empleado | `empleada@mype.pe` | `/my-tickets` |
 | Técnico | `tecnico@unilink.pe` | `/technician` |
 | Administrador UniLink | `soporte@unilink.pe` | `/admin/tickets` |
+
+La contraseña pública `123456` correspondía al **servidor Node.js de demostración anterior**, no al backend ASP.NET Core ni a las cuentas de producción.
+
+## Conexión con la REST API definitiva (ASP.NET Core)
+
+La REST API oficial está en [UniLink/compucare-api](https://github.com/upc-pre-202620-1asi0730-8093-UniLink/compucare-api). No se copia el código C# dentro de este repositorio; las vistas Vue consumen sus recursos JSON mediante Axios.
+
+**Pruebas locales, con la API C# y PostgreSQL ejecutándose:**
+
+```dotenv
+VITE_UNILINK_API_URL=http://localhost:5147/api/v1
+```
+
+Coloca esa variable en `.env.local` y ejecuta `npm run dev`. El servidor Node de `server/server.js` sigue disponible únicamente como simulador temporal. No ejecutes ambos servidores en el mismo puerto.
+
+**Netlify (versión pública):** en *Site configuration → Environment variables*, establece `VITE_UNILINK_API_URL=https://TU-DOMINIO-RAILWAY/api/v1`, reemplazando el marcador con el dominio HTTPS auténtico de Railway, y ejecuta un nuevo despliegue. Esa URL se inserta **durante la compilación de Vite**. Debes configurar CORS en la API con el origen exacto de Netlify.
+
+**Comprobación:** un usuario inicia sesión, crea una solicitud y otro usuario autorizado la ve desde su propia cuenta. Las solicitudes solo se comparten si ambos conectan a la misma API y a la misma base PostgreSQL; el backend debe aplicar permisos y filtros por rol/empresa.
 
 ## Scripts disponibles
 

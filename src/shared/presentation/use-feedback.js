@@ -1,4 +1,4 @@
-import {useToast} from "primevue";
+import { useToast } from "primevue/usetoast";
 
 // Avisos de éxito / error reutilizables en todas las vistas
 export function useFeedback() {
