@@ -1,4 +1,4 @@
-// ES copy for CompuCare screen labels, actions, and feedback.
+// ES copy for CompuCare frontend screens.
 export default {
   "myTickets": {
     "s0": "CENTRO DE SOPORTE",
@@ -410,7 +410,8 @@ export default {
     "scheduledCount": "{count} visita(s) registrada(s)",
     "dateIntro": "Elige la fecha, la hora y los equipos que revisará el técnico. Esta visita consumirá 1 de tus {remaining} cupo(s) disponible(s).",
     "equipmentFallback": "Equipo #{id}",
-    "invalidDate": "Selecciona una fecha de hoy en adelante."
+    "invalidDate": "Selecciona una fecha de hoy en adelante.",
+    "scheduledStatus": "Agendado"
   },
   "employees": {
     "s12": "EQUIPO DE TRABAJO",
