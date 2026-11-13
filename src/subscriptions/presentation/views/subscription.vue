@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref } from 'vue'
 import { useConfirm } from 'primevue'
 import useSubscriptionStore from '../../application/subscription.store.js'
@@ -12,6 +13,7 @@ const store = useSubscriptionStore()
 const iam = useIamStore()
 const confirm = useConfirm()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
 
 const loading = ref(false)
 const saving = ref(false)
@@ -94,9 +96,9 @@ function renew() {
     <div class="cc-container">
 
       <PageHeader
-          eyebrow="SUSCRIPCIÓN"
-          title="Plan y bolsa de horas"
-          description="Controla el consumo de horas de soporte, tus visitas preventivas y la renovación de tu plan."
+          :eyebrow="t('screens.subscription.s10')"
+          :title="t('screens.subscription.s11')"
+          :description="t('screens.subscription.s12')"
       >
         <button
             v-if="balance"
@@ -105,20 +107,19 @@ function renew() {
             @click="renew"
         >
           <i class="pi pi-refresh"></i>
-          Renovar suscripción
+          {{ t('screens.subscription.s0') }}
         </button>
       </PageHeader>
 
       <div v-if="loading" class="cc-card">
-        <div class="cc-card-body cc-muted">Cargando suscripción...</div>
+        <div class="cc-card-body cc-muted">{{ t('screens.subscription.s1') }}</div>
       </div>
 
       <template v-else>
         <div v-if="!balance" class="cc-banner cc-banner-warn" role="status">
           <i class="pi pi-exclamation-triangle"></i>
           <span>
-            Tu empresa aún no tiene una suscripción activa.
-            Elige un plan para empezar a solicitar soporte técnico.
+            {{ t('screens.subscription.s2') }}
           </span>
         </div>
 
@@ -135,10 +136,10 @@ function renew() {
         </div>
 
         <template v-if="balance">
-          <section class="cc-stats" aria-label="Resumen de la suscripción">
+          <section class="cc-stats" :aria-label="t('screens.subscription.s13')">
             <article class="cc-stat">
               <div class="cc-stat-top">
-                <span>Plan actual</span>
+                <span>{{ t('screens.subscription.s3') }}</span>
                 <span class="cc-stat-icon"><i class="pi pi-star"></i></span>
               </div>
               <strong>{{ balance.planName }}</strong>
@@ -149,7 +150,7 @@ function renew() {
 
             <article class="cc-stat">
               <div class="cc-stat-top">
-                <span>Horas restantes</span>
+                <span>{{ t('screens.subscription.s4') }}</span>
                 <span class="cc-stat-icon cc-icon-done"><i class="pi pi-clock"></i></span>
               </div>
               <strong>{{ balance.hoursRemaining }} h</strong>
@@ -158,7 +159,7 @@ function renew() {
 
             <article class="cc-stat">
               <div class="cc-stat-top">
-                <span>Visitas preventivas</span>
+                <span>{{ t('screens.subscription.s5') }}</span>
                 <span class="cc-stat-icon cc-icon-active"><i class="pi pi-calendar"></i></span>
               </div>
               <strong>{{ balance.preventiveRemaining }}</strong>
@@ -167,7 +168,7 @@ function renew() {
 
             <article class="cc-stat">
               <div class="cc-stat-top">
-                <span>Próxima renovación</span>
+                <span>{{ t('screens.subscription.s6') }}</span>
                 <span class="cc-stat-icon cc-icon-pending"><i class="pi pi-refresh"></i></span>
               </div>
               <strong style="font-size: 22px">{{ formatDate(balance.renewsAt, false) }}</strong>
@@ -178,7 +179,7 @@ function renew() {
           <section class="cc-card">
             <div class="cc-card-head">
               <div>
-                <h2>Consumo de horas</h2>
+                <h2>{{ t('screens.subscription.s7') }}</h2>
                 <p>{{ balance.hoursUsed }} h usadas de {{ balance.hoursTotal }} h</p>
               </div>
 
@@ -191,7 +192,7 @@ function renew() {
               <div
                   class="cc-progress"
                   role="progressbar"
-                  aria-label="Consumo de la bolsa de horas"
+                  :aria-label="t('screens.subscription.s14')"
                   :aria-valuenow="percent"
                   aria-valuemin="0"
                   aria-valuemax="100"
@@ -205,7 +206,7 @@ function renew() {
         <section class="cc-card">
           <div class="cc-card-head">
             <div>
-              <h2>Planes disponibles</h2>
+              <h2>{{ t('screens.subscription.s8') }}</h2>
               <p>
                 {{ balance
                   ? 'Cambiar de plan reinicia tu bolsa de horas y tus visitas preventivas.'
@@ -224,7 +225,7 @@ function renew() {
               >
                 <div class="cc-stat-top">
                   <span>{{ plan.name }}</span>
-                  <span v-if="plan.id === balance?.planId" class="cc-badge cc-badge-done">Plan actual</span>
+                  <span v-if="plan.id === balance?.planId" class="cc-badge cc-badge-done">{{ t('screens.subscription.s3') }}</span>
                   <span v-else class="cc-stat-icon"><i class="pi pi-box"></i></span>
                 </div>
 
@@ -279,7 +280,7 @@ function renew() {
 
         <div class="cc-dialog-actions">
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="billingVisible = false">
-            Cancelar
+            {{ t('screens.subscription.s9') }}
           </button>
 
           <button class="cc-primary-btn" type="submit" :disabled="saving">
