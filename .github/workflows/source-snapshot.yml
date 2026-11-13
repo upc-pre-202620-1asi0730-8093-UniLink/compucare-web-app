@@ -1,0 +1,27 @@
+name: Source snapshot for team handoff
+
+on:
+  push:
+    paths:
+      - '.github/workflows/source-snapshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create complete frontend source backup
+        run: |
+          zip -qr /tmp/compucare-web-app-original-main.zip . \
+            -x '.git/*' -x '.git/**' \
+            -x '.env.local' -x '**/node_modules/*' -x 'dist/*'
+      - name: Upload source ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: compucare-web-app-original-main
+          path: /tmp/compucare-web-app-original-main.zip
+          retention-days: 30
