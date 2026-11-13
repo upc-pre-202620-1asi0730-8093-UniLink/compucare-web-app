@@ -1,6 +1,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
 import useTicketStore from '../../application/ticket.store.js'
 import useQuotationStore from '../../../quotations/application/quotation.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
@@ -8,6 +10,8 @@ import { useFeedback } from '../../../shared/presentation/use-feedback.js'
 const store = useTicketStore()
 const quotes = useQuotationStore()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
+const { refresh, refreshing } = useAutoRefresh(() => Promise.all([store.fetchTickets(), quotes.fetchQuotes()]))
 
 const loading = ref(false)
 const processing = ref(false)
@@ -60,7 +64,7 @@ const diagnosisCount = computed(() =>
 
 const completedCount = computed(() =>
     tickets.value.filter(ticket =>
-        ['Resuelto', 'Completado', 'Cerrado'].includes(ticket.status)
+        ['Atendido', 'Resuelto', 'Completado', 'Cerrado'].includes(ticket.status)
     ).length
 )
 
@@ -78,6 +82,10 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function quoteIsBlocked(ticketId) {
+  return (quotes.quotes || []).some(q => q.ticketId === ticketId && ['PENDING', 'REJECTED'].includes(q.status))
+}
 
 function quoteStatusOf(ticketId) {
   return (quotes.quotes || [])
@@ -102,6 +110,10 @@ async function start(ticket) {
 }
 
 function openClose(ticket) {
+  if (ticket.paused || quoteIsBlocked(ticket.id)) {
+    fail(new Error(t('common.unresolvedQuotation')))
+    return
+  }
   target.value = ticket
 
   report.value = {
@@ -115,6 +127,10 @@ function openClose(ticket) {
 
 async function close() {
   if (!target.value || processing.value) return
+  if (target.value.paused || quoteIsBlocked(target.value.id)) {
+    fail(new Error(t('common.unresolvedQuotation')))
+    return
+  }
 
   if (
       !report.value.diagnosis.trim() ||
@@ -198,6 +214,7 @@ function statusClass(status) {
   if (value.includes('asignado')) return 'status-assigned'
   if (value.includes('diagnóstico')) return 'status-progress'
   if (value.includes('proceso')) return 'status-progress'
+  if (value.includes('atendido')) return 'status-completed'
   if (value.includes('resuelto')) return 'status-completed'
   if (value.includes('completado')) return 'status-completed'
   if (value.includes('cerrado')) return 'status-completed'
@@ -226,9 +243,15 @@ function statusClass(status) {
           </p>
         </div>
 
-        <div class="header-icon" aria-hidden="true">
-          <i class="pi pi-wrench"></i>
-        </div>
+        <button
+            type="button"
+            class="action-button secondary-action"
+            :disabled="refreshing"
+            @click="refresh().catch(fail)"
+        >
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ refreshing ? t('common.refreshing') : t('common.refresh') }}
+        </button>
       </header>
 
       <section class="stats-grid">
@@ -422,7 +445,8 @@ function statusClass(status) {
                     <button
                         class="action-button complete-action"
                         type="button"
-                        :disabled="processing"
+                        :disabled="processing || ticket.paused || quoteIsBlocked(ticket.id)"
+                        :title="ticket.paused || quoteIsBlocked(ticket.id) ? t('common.unresolvedQuotation') : ''"
                         @click="openClose(ticket)"
                     >
                       <i class="pi pi-check"></i>
