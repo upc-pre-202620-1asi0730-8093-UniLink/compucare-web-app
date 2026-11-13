@@ -2,6 +2,8 @@
 import { createI18n } from 'vue-i18n'
 import es from './es.js'
 import en from './en.js'
+import screensEs from './screens-es.js'
+import screensEn from './screens-en.js'
 
 const savedLanguage = localStorage.getItem('compucare-language')
 
@@ -15,8 +17,8 @@ const i18n = createI18n({
     locale,
     fallbackLocale: 'en',
     messages: {
-        es,
-        en
+        es: { ...es, screens: screensEs },
+        en: { ...en, screens: screensEn }
     }
 })
 
