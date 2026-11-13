@@ -1,6 +1,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
 import useTicketStore from '../../application/ticket.store.js'
 import useIamStore from '../../../iam/application/iam.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
@@ -8,6 +10,8 @@ import { useFeedback } from '../../../shared/presentation/use-feedback.js'
 const store = useTicketStore()
 const iam = useIamStore()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
+const { refresh, refreshing } = useAutoRefresh(() => store.fetchTickets())
 
 const chosen = ref({})
 const assigning = ref({})
@@ -70,6 +74,7 @@ const activeCount = computed(() =>
 const completedCount = computed(() =>
     tickets.value.filter(ticket =>
         [
+          'Atendido',
           'Resuelto',
           'Completado',
           'Cerrado'
@@ -116,6 +121,7 @@ function statusClass(status) {
   if (value.includes('asignado')) return 'status-assigned'
   if (value.includes('diagnóstico')) return 'status-progress'
   if (value.includes('proceso')) return 'status-progress'
+  if (value.includes('atendido')) return 'status-completed'
   if (value.includes('resuelto')) return 'status-completed'
   if (value.includes('completado')) return 'status-completed'
   if (value.includes('cerrado')) return 'status-completed'
@@ -144,9 +150,15 @@ function statusClass(status) {
           </p>
         </div>
 
-        <div class="header-icon" aria-hidden="true">
-          <i class="pi pi-clipboard"></i>
-        </div>
+        <button
+            type="button"
+            class="assign-button"
+            :disabled="refreshing"
+            @click="refresh().catch(fail)"
+        >
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ refreshing ? t('common.refreshing') : t('common.refresh') }}
+        </button>
       </header>
 
       <section class="stats-grid" aria-label="Resumen de solicitudes">
