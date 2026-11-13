@@ -7,13 +7,13 @@ const savedLanguage = localStorage.getItem('compucare-language')
 
 const locale = ['es', 'en'].includes(savedLanguage)
     ? savedLanguage
-    : 'es'
+    : 'en'
 
 const i18n = createI18n({
     legacy: false,
     globalInjection: true,
     locale,
-    fallbackLocale: 'es',
+    fallbackLocale: 'en',
     messages: {
         es,
         en
