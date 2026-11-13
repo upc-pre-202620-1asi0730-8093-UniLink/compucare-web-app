@@ -3,7 +3,6 @@ import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import useIamStore from '../../application/iam.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
-import { roleLabels } from '../../../shared/presentation/format.js'
 import PageHeader from '../../../shared/presentation/page-header.vue'
 import PageFooter from '../../../shared/presentation/page-footer.vue'
 
@@ -17,7 +16,7 @@ const savingProfile = ref(false)
 const savingPassword = ref(false)
 
 const initial = computed(() => (iam.user?.name ?? 'U').charAt(0).toUpperCase())
-const roleLabel = computed(() => roleLabels[iam.role] ?? 'Usuario')
+const roleLabel = computed(() => t(`roles.${iam.role === 'company_manager' ? 'admin' : iam.role || 'user'}`))
 
 async function saveProfile() {
   if (savingProfile.value) return
@@ -30,7 +29,7 @@ async function saveProfile() {
       phone: form.value.phone.trim()
     })
 
-    ok('Perfil actualizado')
+    ok(t('screens.profile.updated'))
   } catch (error) {
     fail(error)
   } finally {
@@ -46,7 +45,7 @@ async function savePassword() {
   try {
     await iam.changePassword(pass.value.current, pass.value.next)
 
-    ok('Contraseña actualizada')
+    ok(t('screens.profile.passwordUpdated'))
     pass.value = { current: '', next: '' }
   } catch (error) {
     fail(error)   // "La clave actual no coincide"
@@ -128,7 +127,7 @@ async function savePassword() {
               <div class="cc-dialog-actions">
                 <button class="cc-primary-btn" type="submit" :disabled="savingProfile">
                   <i class="pi pi-save"></i>
-                  {{ savingProfile ? 'Guardando...' : 'Guardar cambios' }}
+                  {{ savingProfile ? t('screens.profile.saving') : t('screens.profile.saveChanges') }}
                 </button>
               </div>
             </form>
@@ -177,7 +176,7 @@ async function savePassword() {
               <div class="cc-dialog-actions">
                 <button class="cc-primary-btn" type="submit" :disabled="savingPassword">
                   <i class="pi pi-key"></i>
-                  {{ savingPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
+                  {{ savingPassword ? t('screens.profile.updating') : t('screens.profile.updatePassword') }}
                 </button>
               </div>
             </form>
