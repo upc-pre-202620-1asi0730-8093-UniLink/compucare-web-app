@@ -32,7 +32,10 @@ export default {
         maintenance: 'Maintenance',
         employees: 'Employees',
         myProfile: 'My profile',
-        logout: 'Sign out'
+        logout: 'Sign out',
+        openMenu: 'Open navigation menu',
+        closeMenu: 'Close navigation menu',
+        userFallback: 'CompuCare user'
     },
     roles: {
         employee: 'Employee',
@@ -54,7 +57,9 @@ export default {
         forgotPassword: 'Forgot your password?',
         registerCompany: 'Register company',
         needHelp: 'Need help signing in?',
-        contactAdmin: 'Contact your company administrator.'
+        contactAdmin: 'Contact your company administrator.',
+        loginSuccessNoPanel: 'Sign-in successful. Your dashboard is not available yet.',
+        loginError: 'Unable to sign in. Check your credentials and try again.'
     },
     tickets: {
         myTickets: 'My requests',
