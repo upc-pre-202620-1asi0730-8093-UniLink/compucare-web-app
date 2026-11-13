@@ -22,7 +22,11 @@ const maintenances = computed(() => store.maintenances || [])
 const remaining = computed(() => store.balance?.preventiveRemaining ?? 0)
 const canSchedule = computed(() => !!store.balance && remaining.value > 0)
 
-const today = computed(() => new Date().toISOString().slice(0, 10))
+const today = computed(() => {
+  const now = new Date()
+  const two = value => String(value).padStart(2, '0')
+  return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`
+})
 
 const sortedMaintenances = computed(() =>
     [...maintenances.value].sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`))
@@ -46,7 +50,7 @@ onMounted(async () => {
 
 function equipmentNames(ids) {
   return ids
-      .map(id => equipment.equipments.find(e => e.id === id)?.name ?? `Equipo #${id}`)
+      .map(id => equipment.equipments.find(e => e.id === id)?.name ?? t('screens.maintenances.equipmentFallback', { id }))
       .join(', ')
 }
 
@@ -64,6 +68,10 @@ async function save() {
   if (saving.value) return
 
   if (!form.value.date || !form.value.time || !form.value.equipmentIds.length) return
+  if (form.value.date < today.value) {
+    fail(new Error(t('screens.maintenances.invalidDate')))
+    return
+  }
 
   saving.value = true
 
@@ -74,7 +82,7 @@ async function save() {
       equipmentIds: form.value.equipmentIds
     })
 
-    ok('Mantenimiento preventivo agendado')
+    ok(t('screens.maintenances.scheduled'))
     visible.value = false
   } catch (error) {
     fail(error)
@@ -183,14 +191,14 @@ async function save() {
               <td>{{ formatDate(`${item.date}T00:00:00`, false) }}</td>
               <td>{{ item.time }}</td>
               <td style="white-space: normal; min-width: 220px">{{ equipmentNames(item.equipmentIds) }}</td>
-              <td><span class="cc-badge cc-badge-assigned">{{ item.status }}</span></td>
+              <td><span class="cc-badge cc-badge-assigned">{{ item.status === 'Agendado' ? t('screens.maintenances.scheduledStatus') : item.status }}</span></td>
             </tr>
             </tbody>
           </table>
         </div>
 
         <div class="cc-table-footer">
-          {{ sortedMaintenances.length }} visita(s) registrada(s)
+          {{ t('screens.maintenances.scheduledCount', { count: sortedMaintenances.length }) }}
         </div>
       </section>
 
@@ -205,8 +213,7 @@ async function save() {
     >
       <form class="cc-form" @submit.prevent="save">
         <p class="cc-dialog-desc">
-          Elige la fecha, la hora y los equipos que revisará el técnico.
-          Esta visita consumirá 1 de tus {{ remaining }} cupo(s) disponible(s).
+          {{ t('screens.maintenances.dateIntro', { remaining }) }}
         </p>
 
         <div class="cc-form-row">
@@ -255,7 +262,7 @@ async function save() {
               :disabled="saving || !form.equipmentIds.length"
           >
             <i class="pi pi-calendar-plus"></i>
-            {{ saving ? 'Agendando...' : 'Agendar visita' }}
+            {{ saving ? t('screens.maintenances.saving') : t('screens.maintenances.schedule') }}
           </button>
         </div>
       </form>
