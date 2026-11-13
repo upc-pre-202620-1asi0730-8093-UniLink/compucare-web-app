@@ -131,7 +131,7 @@ async function save() {
       description: form.value.description.trim()
     })
 
-    ok('Solicitud enviada correctamente')
+    ok(t('screens.myTickets.created'))
     visible.value = false
 
     form.value = {
@@ -153,15 +153,15 @@ function openTimeline(ticket) {
 
 function cancel(ticket) {
   confirm.require({
-    header: 'Cancelar solicitud',
-    message: `¿Deseas cancelar la solicitud #${ticket.id}?`,
+    header: t('screens.myTickets.cancelTitle'),
+    message: t('screens.myTickets.cancelQuestion', { id: ticket.id }),
     icon: 'pi pi-exclamation-triangle',
-    acceptLabel: 'Sí, cancelar',
-    rejectLabel: 'Volver',
+    acceptLabel: t('screens.myTickets.confirmCancel'),
+    rejectLabel: t('screens.myTickets.back'),
     accept: async () => {
       try {
         await store.cancelTicket(ticket.id)
-        ok('Solicitud cancelada')
+        ok(t('screens.myTickets.cancelled'))
       } catch (error) {
         fail(error)
       }
@@ -186,7 +186,7 @@ function statusClass(status) {
 }
 
 function formatDate(value) {
-  if (!value) return 'Fecha no disponible'
+  if (!value) return t('screens.myTickets.unknownDate')
 
   const date = new Date(value)
 
@@ -355,7 +355,7 @@ function formatDate(value) {
                     </span>
 
                   <span>
-                      {{ ticket.equipmentName || 'Equipo registrado' }}
+                      {{ ticket.equipmentName || t('screens.myTickets.equipmentFallback') }}
                     </span>
                 </div>
               </td>
@@ -379,7 +379,7 @@ function formatDate(value) {
                       class="icon-button"
                       type="button"
                       :title="t('screens.myTickets.s30')"
-                      :aria-label="`Ver seguimiento del ticket ${ticket.id}`"
+                      :aria-label="t('screens.myTickets.viewAria', { id: ticket.id })"
                       @click="openTimeline(ticket)"
                   >
                     <i class="pi pi-clock"></i>
@@ -390,7 +390,7 @@ function formatDate(value) {
                       class="icon-button danger-button"
                       type="button"
                       :title="t('screens.myTickets.s31')"
-                      :aria-label="`Cancelar ticket ${ticket.id}`"
+                      :aria-label="t('screens.myTickets.cancelAria', { id: ticket.id })"
                       @click="cancel(ticket)"
                   >
                     <i class="pi pi-times"></i>
@@ -404,8 +404,7 @@ function formatDate(value) {
 
         <div class="table-footer">
           <span>
-            Mostrando {{ filteredTickets.length }} de
-            {{ tickets.length }} solicitudes
+            {{ t('screens.myTickets.showing', { shown: filteredTickets.length, total: tickets.length }) }}
           </span>
         </div>
       </section>
@@ -489,7 +488,7 @@ function formatDate(value) {
               :disabled="saving"
           >
             <i class="pi pi-send"></i>
-            {{ saving ? 'Enviando...' : 'Enviar solicitud' }}
+            {{ saving ? t('screens.myTickets.sending') : t('screens.myTickets.submit') }}
           </button>
         </div>
       </form>
@@ -498,7 +497,7 @@ function formatDate(value) {
     <!-- Seguimiento de la solicitud -->
     <pv-dialog
         v-model:visible="timelineVisible"
-        :header="`Seguimiento del ticket #${selected?.id ?? ''}`"
+        :header="t('screens.myTickets.follow', { id: selected?.id ?? '' })"
         modal
         :style="{ width: 'min(460px, 94vw)' }"
     >
