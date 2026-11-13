@@ -62,7 +62,7 @@ async function save() {
       desk: form.value.desk.trim()
     })
 
-    ok('Ubicación registrada correctamente')
+    ok(t('screens.locations.created'))
     visible.value = false
   } catch (error) {
     fail(error)
@@ -75,17 +75,17 @@ function toggle(location) {
   const activating = !location.active
 
   confirm.require({
-    header: activating ? 'Activar ubicación' : 'Desactivar ubicación',
+    header: t(activating ? 'screens.locations.activateHeader' : 'screens.locations.deactivateHeader'),
     message: activating
-        ? `¿Deseas activar ${location.name} · ${location.desk}?`
-        : `¿Deseas desactivar ${location.name} · ${location.desk}? No podrá usarse para nuevos equipos.`,
+        ? t('screens.locations.activateQuestion', { name: location.name, desk: location.desk })
+        : t('screens.locations.deactivateQuestion', { name: location.name, desk: location.desk }),
     icon: 'pi pi-exclamation-triangle',
-    acceptLabel: activating ? 'Sí, activar' : 'Sí, desactivar',
-    rejectLabel: 'Volver',
+    acceptLabel: t(activating ? 'screens.locations.confirmActivate' : 'screens.locations.confirmDeactivate'),
+    rejectLabel: t('screens.locations.back'),
     accept: async () => {
       try {
         await store.setLocationActive(location.id, activating)
-        ok(activating ? 'Ubicación activada' : 'Ubicación desactivada')
+        ok(t(activating ? 'screens.locations.activated' : 'screens.locations.deactivated'))
       } catch (error) {
         fail(error)
       }
@@ -197,7 +197,7 @@ function toggle(location) {
                     class="cc-badge"
                     :class="location.active ? 'cc-badge-done' : 'cc-badge-default'"
                 >
-                  {{ location.active ? 'Activa' : 'Inactiva' }}
+                  {{ t(location.active ? 'screens.locations.active' : 'screens.locations.inactive') }}
                 </span>
               </td>
 
@@ -207,8 +207,8 @@ function toggle(location) {
                       class="cc-icon-btn"
                       :class="{ 'cc-danger': location.active }"
                       type="button"
-                      :title="location.active ? 'Desactivar' : 'Activar'"
-                      :aria-label="`${location.active ? 'Desactivar' : 'Activar'} ${location.name} ${location.desk}`"
+                      :title="t(location.active ? 'screens.locations.deactivate' : 'screens.locations.activate')"
+                      :aria-label="t('screens.locations.toggleAria', { action: t(location.active ? 'screens.locations.deactivate' : 'screens.locations.activate'), name: location.name, desk: location.desk })"
                       @click="toggle(location)"
                   >
                     <i :class="location.active ? 'pi pi-ban' : 'pi pi-check-circle'"></i>
@@ -221,7 +221,7 @@ function toggle(location) {
         </div>
 
         <div class="cc-table-footer">
-          Mostrando {{ filteredLocations.length }} de {{ locations.length }} ubicaciones
+          {{ t('screens.locations.showing', { shown: filteredLocations.length, total: locations.length }) }}
         </div>
       </section>
 
@@ -268,7 +268,7 @@ function toggle(location) {
 
           <button class="cc-primary-btn" type="submit" :disabled="saving">
             <i class="pi pi-save"></i>
-            {{ saving ? 'Guardando...' : 'Guardar ubicación' }}
+            {{ saving ? t('screens.locations.saving') : t('screens.locations.saveLocation') }}
           </button>
         </div>
       </form>
