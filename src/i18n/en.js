@@ -19,7 +19,10 @@ export default {
         language: 'Language',
         refresh: 'Refresh',
         refreshing: 'Refreshing...',
-        unresolvedQuotation: 'This request has a pending or rejected quotation. Resolve it before closing the ticket.'
+        unresolvedQuotation: 'This request has a pending or rejected quotation. Resolve it before closing the ticket.',
+        invalidDemoPayment: "Enter a test holder and exactly four fictitious card digits.",
+        demoPaymentNote: "Simulated payment of",
+        testCardLast4: "Last four digits of a test card"
     },
     navigation: {
         mainMenu: 'MAIN MENU',
