@@ -1,6 +1,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
 import { useConfirm } from 'primevue'
 import useTicketStore from '../../application/ticket.store.js'
 import useEquipmentStore from '../../../equipment/application/equipment.store.js'
@@ -10,6 +12,8 @@ const store = useTicketStore()
 const equipment = useEquipmentStore()
 const confirm = useConfirm()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
+const { refresh, refreshing } = useAutoRefresh(() => store.fetchTickets())
 
 const categories = [
   'Hardware',
@@ -67,7 +71,7 @@ const activeCount = computed(() =>
 
 const completedCount = computed(() =>
     tickets.value.filter(ticket =>
-        ['Resuelto', 'Completado', 'Cerrado'].includes(ticket.status)
+        ['Atendido', 'Resuelto', 'Completado', 'Cerrado'].includes(ticket.status)
     ).length
 )
 
@@ -168,6 +172,7 @@ function statusClass(status) {
   if (normalized.includes('asignado')) return 'status-assigned'
   if (normalized.includes('diagnóstico')) return 'status-progress'
   if (normalized.includes('proceso')) return 'status-progress'
+  if (normalized.includes('atendido')) return 'status-completed'
   if (normalized.includes('resuelto')) return 'status-completed'
   if (normalized.includes('completado')) return 'status-completed'
   if (normalized.includes('cerrado')) return 'status-completed'
@@ -185,7 +190,7 @@ function formatDate(value) {
     return String(value)
   }
 
-  return new Intl.DateTimeFormat('es-PE', {
+  return new Intl.DateTimeFormat(document.documentElement.lang === 'en' ? 'en-US' : 'es-PE', {
     dateStyle: 'medium',
     timeStyle: 'short'
   }).format(date)
@@ -218,6 +223,15 @@ function formatDate(value) {
         >
           <i class="pi pi-plus"></i>
           Reportar falla
+        </button>
+        <button
+            type="button"
+            class="secondary-button"
+            :disabled="refreshing"
+            @click="refresh().catch(fail)"
+        >
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ refreshing ? t('common.refreshing') : t('common.refresh') }}
         </button>
       </header>
 
