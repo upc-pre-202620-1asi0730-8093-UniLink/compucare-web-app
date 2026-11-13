@@ -1,4 +1,4 @@
-// ES copy for CompuCare frontend screens.
+// UI copy for CompuCare, locale es.
 export default {
   "myTickets": {
     "s0": "CENTRO DE SOPORTE",
@@ -435,8 +435,9 @@ export default {
     "saving": "Guardando...",
     "create": "Registrar e invitar",
     "count": "{count} empleado(s) en tu empresa.",
-    "inviteNote": "Se enviará una invitación al correo del empleado con una clave temporal.",
-    "demoToken": "Clave temporal enviada (solo desarrollo):"
+    "inviteNote": "En la demostración, la invitación por correo es simulada. El acceso del empleado se habilita al completar el backend de notificaciones.",
+    "demoToken": "Clave temporal enviada (solo desarrollo):",
+    "showing": "Mostrando {shown} de {total} empleados"
   },
   "profile": {
     "s9": "MI CUENTA",
