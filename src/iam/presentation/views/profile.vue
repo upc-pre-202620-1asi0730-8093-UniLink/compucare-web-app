@@ -1,14 +1,13 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import useIamStore from '../../application/iam.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
+import { roleLabels } from '../../../shared/presentation/format.js'
 import PageHeader from '../../../shared/presentation/page-header.vue'
 import PageFooter from '../../../shared/presentation/page-footer.vue'
 
 const iam = useIamStore()
 const { ok, fail } = useFeedback()
-const { t } = useI18n({ useScope: 'global' })
 
 const form = ref({ name: iam.user?.name ?? '', phone: iam.user?.phone ?? '' })
 const pass = ref({ current: '', next: '' })
@@ -16,7 +15,7 @@ const savingProfile = ref(false)
 const savingPassword = ref(false)
 
 const initial = computed(() => (iam.user?.name ?? 'U').charAt(0).toUpperCase())
-const roleLabel = computed(() => t(`roles.${iam.role === 'company_manager' ? 'admin' : iam.role || 'user'}`))
+const roleLabel = computed(() => roleLabels[iam.role] ?? 'Usuario')
 
 async function saveProfile() {
   if (savingProfile.value) return
@@ -29,7 +28,7 @@ async function saveProfile() {
       phone: form.value.phone.trim()
     })
 
-    ok(t('screens.profile.updated'))
+    ok('Perfil actualizado')
   } catch (error) {
     fail(error)
   } finally {
@@ -45,7 +44,7 @@ async function savePassword() {
   try {
     await iam.changePassword(pass.value.current, pass.value.next)
 
-    ok(t('screens.profile.passwordUpdated'))
+    ok('Contraseña actualizada')
     pass.value = { current: '', next: '' }
   } catch (error) {
     fail(error)   // "La clave actual no coincide"
@@ -60,9 +59,9 @@ async function savePassword() {
     <div class="cc-container">
 
       <PageHeader
-          :eyebrow="t('screens.profile.s9')"
-          :title="t('screens.profile.s10')"
-          :description="t('screens.profile.s11')"
+          eyebrow="MI CUENTA"
+          title="Mi perfil"
+          description="Actualiza tus datos de contacto y mantén segura tu contraseña."
       />
 
       <section class="cc-grid-2">
@@ -89,18 +88,18 @@ async function savePassword() {
           <div class="cc-card-body">
             <form class="cc-form" @submit.prevent="saveProfile">
               <div class="cc-field">
-                <label for="profile-email">{{ t('screens.profile.s0') }}</label>
+                <label for="profile-email">Correo electrónico</label>
                 <input id="profile-email" class="cc-input" :value="iam.user?.email" readonly />
-                <small>{{ t('screens.profile.s1') }}</small>
+                <small>El correo no se puede modificar.</small>
               </div>
 
               <div class="cc-field">
-                <label for="profile-position">{{ t('screens.profile.s2') }}</label>
+                <label for="profile-position">Cargo</label>
                 <input id="profile-position" class="cc-input" :value="iam.user?.position || '—'" readonly />
               </div>
 
               <div class="cc-field">
-                <label for="profile-name">{{ t('screens.profile.s3') }}</label>
+                <label for="profile-name">Nombre completo</label>
                 <input
                     id="profile-name"
                     v-model="form.name"
@@ -112,7 +111,7 @@ async function savePassword() {
               </div>
 
               <div class="cc-field">
-                <label for="profile-phone">{{ t('screens.profile.s4') }}</label>
+                <label for="profile-phone">Teléfono</label>
                 <input
                     id="profile-phone"
                     v-model="form.phone"
@@ -127,7 +126,7 @@ async function savePassword() {
               <div class="cc-dialog-actions">
                 <button class="cc-primary-btn" type="submit" :disabled="savingProfile">
                   <i class="pi pi-save"></i>
-                  {{ savingProfile ? t('screens.profile.saving') : t('screens.profile.saveChanges') }}
+                  {{ savingProfile ? 'Guardando...' : 'Guardar cambios' }}
                 </button>
               </div>
             </form>
@@ -137,8 +136,8 @@ async function savePassword() {
         <article class="cc-card">
           <div class="cc-card-head">
             <div>
-              <h2>{{ t('screens.profile.s5') }}</h2>
-              <p>{{ t('screens.profile.s6') }}</p>
+              <h2>Cambiar contraseña</h2>
+              <p>Usa una contraseña de al menos 6 caracteres.</p>
             </div>
 
             <span class="cc-stat-icon"><i class="pi pi-lock"></i></span>
@@ -147,7 +146,7 @@ async function savePassword() {
           <div class="cc-card-body">
             <form class="cc-form" @submit.prevent="savePassword">
               <div class="cc-field">
-                <label for="current-password">{{ t('screens.profile.s7') }}</label>
+                <label for="current-password">Contraseña actual</label>
                 <input
                     id="current-password"
                     v-model="pass.current"
@@ -160,7 +159,7 @@ async function savePassword() {
               </div>
 
               <div class="cc-field">
-                <label for="new-password">{{ t('screens.profile.s8') }}</label>
+                <label for="new-password">Nueva contraseña</label>
                 <input
                     id="new-password"
                     v-model="pass.next"
@@ -176,7 +175,7 @@ async function savePassword() {
               <div class="cc-dialog-actions">
                 <button class="cc-primary-btn" type="submit" :disabled="savingPassword">
                   <i class="pi pi-key"></i>
-                  {{ savingPassword ? t('screens.profile.updating') : t('screens.profile.updatePassword') }}
+                  {{ savingPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
                 </button>
               </div>
             </form>
