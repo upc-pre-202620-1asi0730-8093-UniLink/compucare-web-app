@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref } from 'vue'
 import useEquipmentStore from '../../application/equipment.store.js'
 import useIamStore from '../../../iam/application/iam.store.js'
@@ -10,6 +11,7 @@ import PageFooter from '../../../shared/presentation/page-footer.vue'
 const store = useEquipmentStore()
 const iam = useIamStore()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
 
 const types = ['Desktop', 'Laptop', 'Impresora', 'Servidor', 'Red', 'Otro']
 const statuses = ['Operativo', 'En Reparación']
@@ -181,36 +183,36 @@ async function openHistory(item) {
             @click="openCreate"
         >
           <i class="pi pi-plus"></i>
-          Registrar equipo
+          {{ t('screens.equipments.s0') }}
         </button>
       </PageHeader>
 
       <section class="cc-stats" aria-label="Resumen de equipos">
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Total de equipos</span>
+            <span>{{ t('screens.equipments.s1') }}</span>
             <span class="cc-stat-icon"><i class="pi pi-desktop"></i></span>
           </div>
           <strong>{{ equipments.length }}</strong>
-          <span class="cc-stat-caption">Equipos registrados</span>
+          <span class="cc-stat-caption">{{ t('screens.equipments.s2') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Operativos</span>
+            <span>{{ t('screens.equipments.s3') }}</span>
             <span class="cc-stat-icon cc-icon-done"><i class="pi pi-check-circle"></i></span>
           </div>
           <strong>{{ operativeCount }}</strong>
-          <span class="cc-stat-caption">Funcionando con normalidad</span>
+          <span class="cc-stat-caption">{{ t('screens.equipments.s4') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>En reparación</span>
+            <span>{{ t('screens.equipments.s5') }}</span>
             <span class="cc-stat-icon cc-icon-pending"><i class="pi pi-wrench"></i></span>
           </div>
           <strong>{{ repairCount }}</strong>
-          <span class="cc-stat-caption">Con soporte en curso</span>
+          <span class="cc-stat-caption">{{ t('screens.equipments.s6') }}</span>
         </article>
 
         <article class="cc-stat">
@@ -228,8 +230,8 @@ async function openHistory(item) {
       <section class="cc-card">
         <div class="cc-card-head">
           <div>
-            <h2>Listado de equipos</h2>
-            <p>Filtra por tipo, estado o ubicación.</p>
+            <h2>{{ t('screens.equipments.s7') }}</h2>
+            <p>{{ t('screens.equipments.s8') }}</p>
           </div>
 
           <div class="cc-filters">
@@ -238,22 +240,22 @@ async function openHistory(item) {
               <input
                   v-model="search"
                   type="search"
-                  placeholder="Buscar por código, nombre o serie..."
-                  aria-label="Buscar equipos"
+                  :placeholder="t('screens.equipments.s35')"
+                  :aria-label="t('screens.equipments.s36')"
               />
             </div>
 
             <pv-select
                 v-model="typeFilter"
                 :options="types"
-                placeholder="Tipo"
+                :placeholder="t('screens.equipments.s12')"
                 show-clear
             />
 
             <pv-select
                 v-model="statusFilter"
                 :options="statuses"
-                placeholder="Estado"
+                :placeholder="t('screens.equipments.s15')"
                 show-clear
             />
 
@@ -263,7 +265,7 @@ async function openHistory(item) {
                 :options="locationOptions"
                 option-label="label"
                 option-value="id"
-                placeholder="Sede"
+                :placeholder="t('screens.equipments.s37')"
                 show-clear
             />
           </div>
@@ -273,21 +275,21 @@ async function openHistory(item) {
           <table class="cc-table">
             <thead>
             <tr>
-              <th>Código</th>
-              <th>Equipo</th>
-              <th>N.º de serie</th>
-              <th>Tipo</th>
-              <th>Ubicación</th>
-              <th v-if="isAdmin">Asignado a</th>
-              <th>Estado</th>
-              <th v-if="isAdmin" class="cc-th-right">Acciones</th>
+              <th>{{ t('screens.equipments.s9') }}</th>
+              <th>{{ t('screens.equipments.s10') }}</th>
+              <th>{{ t('screens.equipments.s11') }}</th>
+              <th>{{ t('screens.equipments.s12') }}</th>
+              <th>{{ t('screens.equipments.s13') }}</th>
+              <th v-if="isAdmin">{{ t('screens.equipments.s14') }}</th>
+              <th>{{ t('screens.equipments.s15') }}</th>
+              <th v-if="isAdmin" class="cc-th-right">{{ t('screens.equipments.s16') }}</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
               <td :colspan="isAdmin ? 8 : 6" class="cc-empty-cell">
-                Cargando equipos...
+                {{ t('screens.equipments.s17') }}
               </td>
             </tr>
 
@@ -295,7 +297,7 @@ async function openHistory(item) {
               <td :colspan="isAdmin ? 8 : 6" class="cc-empty-cell">
                 <div class="cc-empty">
                   <i class="pi pi-desktop"></i>
-                  <strong>No hay equipos para mostrar</strong>
+                  <strong>{{ t('screens.equipments.s18') }}</strong>
                   <span>
                     {{ isAdmin
                       ? 'Registra un equipo o ajusta los filtros de búsqueda.'
@@ -327,7 +329,7 @@ async function openHistory(item) {
 
               <td v-if="isAdmin">
                 <span v-if="item.assignedTo">{{ employeeName(item.assignedTo) }}</span>
-                <span v-else class="cc-muted">Sin asignar</span>
+                <span v-else class="cc-muted">{{ t('screens.equipments.s19') }}</span>
               </td>
 
               <td>
@@ -341,7 +343,7 @@ async function openHistory(item) {
                   <button
                       class="cc-icon-btn"
                       type="button"
-                      title="Asignar equipo"
+                      :title="t('screens.equipments.s38')"
                       :aria-label="`Asignar ${item.name}`"
                       @click="openAssign(item)"
                   >
@@ -351,7 +353,7 @@ async function openHistory(item) {
                   <button
                       class="cc-icon-btn"
                       type="button"
-                      title="Ver historial"
+                      :title="t('screens.equipments.s39')"
                       :aria-label="`Ver historial de ${item.name}`"
                       @click="openHistory(item)"
                   >
@@ -375,58 +377,58 @@ async function openHistory(item) {
     <!-- Registrar equipo -->
     <pv-dialog
         v-model:visible="createVisible"
-        header="Registrar equipo"
+        :header="t('screens.equipments.s0')"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
       <form class="cc-form" @submit.prevent="saveEquipment">
         <p class="cc-dialog-desc">
-          Ingresa los datos del equipo. El código interno se genera automáticamente.
+          {{ t('screens.equipments.s20') }}
         </p>
 
         <div class="cc-field">
-          <label for="eq-name">Nombre del equipo</label>
+          <label for="eq-name">{{ t('screens.equipments.s21') }}</label>
           <input
               id="eq-name"
               v-model="form.name"
               class="cc-input"
-              placeholder="Ej. Laptop Ventas"
+              :placeholder="t('screens.equipments.s40')"
               required
           />
         </div>
 
         <div class="cc-field">
-          <label for="eq-serial">Número de serie</label>
+          <label for="eq-serial">{{ t('screens.equipments.s22') }}</label>
           <input
               id="eq-serial"
               v-model="form.serialNumber"
               class="cc-input"
-              placeholder="Ej. SN-1003"
+              :placeholder="t('screens.equipments.s41')"
               required
           />
         </div>
 
         <div class="cc-form-row">
           <div class="cc-field">
-            <label for="eq-type">Tipo</label>
+            <label for="eq-type">{{ t('screens.equipments.s12') }}</label>
             <pv-select
                 v-model="form.type"
                 input-id="eq-type"
                 :options="types"
-                placeholder="Selecciona el tipo"
+                :placeholder="t('screens.equipments.s42')"
                 class="cc-full"
             />
           </div>
 
           <div class="cc-field">
-            <label for="eq-location">Sede (opcional)</label>
+            <label for="eq-location">{{ t('screens.equipments.s23') }}</label>
             <pv-select
                 v-model="form.locationId"
                 input-id="eq-location"
                 :options="activeLocationOptions"
                 option-label="label"
                 option-value="id"
-                placeholder="Selecciona la sede"
+                :placeholder="t('screens.equipments.s43')"
                 class="cc-full"
                 show-clear
             />
@@ -435,7 +437,7 @@ async function openHistory(item) {
 
         <div class="cc-dialog-actions">
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="createVisible = false">
-            Cancelar
+            {{ t('screens.equipments.s24') }}
           </button>
 
           <button
@@ -459,18 +461,18 @@ async function openHistory(item) {
     >
       <form class="cc-form" @submit.prevent="saveAssignment(assignee)">
         <p class="cc-dialog-desc">
-          Elige al empleado responsable. Cada cambio queda registrado en el historial del equipo.
+          {{ t('screens.equipments.s25') }}
         </p>
 
         <div class="cc-field">
-          <label for="eq-assignee">Empleado</label>
+          <label for="eq-assignee">{{ t('screens.equipments.s26') }}</label>
           <pv-select
               v-model="assignee"
               input-id="eq-assignee"
               :options="iam.employees"
               option-label="name"
               option-value="id"
-              placeholder="Selecciona un empleado"
+              :placeholder="t('screens.equipments.s44')"
               class="cc-full"
               filter
           />
@@ -485,11 +487,11 @@ async function openHistory(item) {
               @click="saveAssignment(null)"
           >
             <i class="pi pi-user-minus"></i>
-            Quitar asignación
+            {{ t('screens.equipments.s27') }}
           </button>
 
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="assignVisible = false">
-            Cancelar
+            {{ t('screens.equipments.s24') }}
           </button>
 
           <button class="cc-primary-btn" type="submit" :disabled="saving || !assignee">
@@ -507,14 +509,14 @@ async function openHistory(item) {
         modal
         :style="{ width: 'min(560px, 94vw)' }"
     >
-      <div v-if="!store.history" class="cc-timeline-empty">Cargando historial...</div>
+      <div v-if="!store.history" class="cc-timeline-empty">{{ t('screens.equipments.s28') }}</div>
 
       <div v-else class="cc-form">
         <div>
-          <h3 class="cc-section-title">Asignaciones</h3>
+          <h3 class="cc-section-title">{{ t('screens.equipments.s29') }}</h3>
 
           <div v-if="!store.history.assignments.length" class="cc-timeline-empty">
-            Sin asignaciones registradas.
+            {{ t('screens.equipments.s30') }}
           </div>
 
           <div class="cc-timeline">
@@ -533,10 +535,10 @@ async function openHistory(item) {
         </div>
 
         <div>
-          <h3 class="cc-section-title">Solicitudes de soporte</h3>
+          <h3 class="cc-section-title">{{ t('screens.equipments.s31') }}</h3>
 
           <div v-if="!store.history.tickets.length" class="cc-timeline-empty">
-            Sin solicitudes registradas.
+            {{ t('screens.equipments.s32') }}
           </div>
 
           <div class="cc-timeline">
@@ -558,10 +560,10 @@ async function openHistory(item) {
         </div>
 
         <div>
-          <h3 class="cc-section-title">Mantenimientos preventivos</h3>
+          <h3 class="cc-section-title">{{ t('screens.equipments.s33') }}</h3>
 
           <div v-if="!store.history.maintenances.length" class="cc-timeline-empty">
-            Sin mantenimientos programados.
+            {{ t('screens.equipments.s34') }}
           </div>
 
           <div class="cc-timeline">
