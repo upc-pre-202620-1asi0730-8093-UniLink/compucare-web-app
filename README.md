@@ -1,25 +1,90 @@
-# UniLink
+# CompuCare — Frontend Web Application
 
-Plataforma web de soporte técnico por suscripción para MYPE. Estructura tomada de `learning-center`:
-Vue 3 + Vite + Pinia + PrimeVue + Axios, con una API simulada en json-server.
+Aplicación Vue 3 de UniLink para gestionar soporte técnico empresarial por suscripción. **Proyecto académico en desarrollo.** La SPA utiliza JavaScript, Vite, PrimeVue, Pinia, Vue Router, Axios y Vue I18n.
 
-## Cómo correrlo
+## Arquitectura funcional (DDD)
+
+El frontend agrupa interfaces por los cinco **Bounded Contexts** del producto. Su numeración es la establecida en el informe y no indica prioridad estratégica.
+
+| Clasificación estratégica | BC | Carpeta del frontend | Responsabilidad |
+| --- | --- | --- | --- |
+| **Core** | BC04 — Service Requests | `src/service-requests/` | Tickets, asignaciones y diagnósticos |
+| **Core** | BC03 — Subscriptions and Coverage | `src/subscriptions/` | Planes, saldo de horas y mantenimientos |
+| **Supporting** | BC02 — Companies and Equipment | `src/equipment/` | Equipos, ubicaciones y su asignación |
+| **Supporting** | BC05 — Quotations and Payments | `src/quotations/` | Cotizaciones y pagos simulados |
+| **Generic** | BC01 — Identity and Access | `src/iam/` | Login, usuarios, sesión y permisos |
+
+La interfaz se organiza en módulos con vistas `presentation`, lógica de aplicación y adaptadores HTTP `infrastructure`. **Las invariantes del dominio deben aplicarse y probarse en el backend**, no confiar exclusivamente en validaciones del navegador. Las clases de API del frontend constituyen consumidores de contratos HTTP; no son los agregados del dominio.
+
+**Referencia de arquitectura:** [DDD — mapa de contextos, agregados y capas](https://github.com/upc-pre-202620-1asi0730-8093-UniLink/report/blob/main/docs/ddd-architecture.md).
+
+## Requisitos para ejecución local
+
+- Node.js y npm compatibles con Vite 8.
+- Dos terminales (servidor de demostración y SPA).
 
 ```bash
 npm install
-# Terminal 1: API simulada (http://localhost:3000/api/v1)
-npm run api
-# Terminal 2: frontend (http://localhost:5173)
+```
+
+Crea un archivo `.env.local` en la raíz del proyecto (no lo subas a GitHub):
+
+```dotenv
+VITE_UNILINK_API_URL=http://localhost:3000/api/v1
+```
+
+**Terminal 1 — API de demostración:**
+
+```bash
+npm run start
+```
+
+**Terminal 2 — Web Application:**
+
+```bash
 npm run dev
 ```
 
-Pega tu licencia de PrimeUI en `.env.development` (`VITE_PRIME_UI_LICENSE_KEY`), igual que en learning-center.
+Accede a la URL local que indique Vite (normalmente `http://localhost:5173`).
 
-## Usuarios de prueba (clave `123456`)
+> La API actual se encuentra en `server/server.js`, usa Node.js, JSON Server y `db.json`, y **solo sirve para desarrollo y demostración**. No es la API ASP.NET Core con Entity Framework Core exigida para la entrega. Contiene credenciales de prueba y simulación de correos; no se debe exponer públicamente como entorno productivo.
 
-| Rol | Correo | Entra a |
-|---|---|---|
-| Administrador de MYPE | admin@mype.pe | /dashboard |
-| Empleado | empleada@mype.pe | /my-tickets |
-| Técnico de soporte | tecnico@unilink.pe | /technician |
-| Administrador del sistema | soporte@unilink.pe | /admin/tickets |
+## Usuarios de demostración
+
+**Contraseña común de prueba: `123456`.**
+
+| Rol | Correo | Ruta inicial |
+| --- | --- | --- |
+| Administrador empresarial | `admin@mype.pe` | `/dashboard` |
+| Empleado | `empleada@mype.pe` | `/my-tickets` |
+| Técnico | `tecnico@unilink.pe` | `/technician` |
+| Administrador UniLink | `soporte@unilink.pe` | `/admin/tickets` |
+
+## Scripts disponibles
+
+| Comando | Acción |
+| --- | --- |
+| `npm run dev` | Ejecuta Vite en desarrollo |
+| `npm run start` | Ejecuta la API de demostración |
+| `npm run build` | Genera archivos estáticos en `dist/` |
+| `npm run preview` | Sirve localmente la compilación de Vite |
+
+## Internacionalización y accesibilidad
+
+La navegación y parte de la interfaz soportan inglés (`en`) y español (`es`) mediante Vue I18n. El idioma inicial está configurado como **inglés** y se conserva la elección en `localStorage`. Las pantallas todavía necesitan una revisión completa para sustituir textos fijos, verificar etiquetas ARIA y comprobar que todo el recorrido sea accesible desde teclado.
+
+## Despliegue y configuración
+
+Para publicar en un hosting estático:
+
+1. Construye con `npm run build`, publicando la carpeta `dist`.
+2. Configura `VITE_UNILINK_API_URL` con una **API real HTTPS desplegada**, no `localhost`.
+3. Mantén el fallback SPA de `public/_redirects` (`/* /index.html 200`) para rutas como `/login`.
+4. Comprueba que la API permita CORS desde el dominio final y que las operaciones de los cinco BC funcionen tras recargar la página.
+
+**Pendiente de AV2:** implementar y desplegar la API definitiva ASP.NET Core en C#, configurar persistencia relacional y reemplazar el servidor simulado. Los controles de autenticación/autorización deben proteger los endpoints en el servidor.
+
+## Repositorios del equipo
+
+- [Landing Page](https://github.com/upc-pre-202620-1asi0730-8093-UniLink/landing)
+- [Project Report](https://github.com/upc-pre-202620-1asi0730-8093-UniLink/report)
