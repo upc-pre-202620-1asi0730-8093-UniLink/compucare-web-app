@@ -1,4 +1,4 @@
-// EN copy for CompuCare screen labels, actions, and feedback.
+// EN copy for CompuCare frontend screens.
 export default {
   "myTickets": {
     "s0": "SUPPORT CENTER",
@@ -410,7 +410,8 @@ export default {
     "scheduledCount": "{count} maintenance visit(s) recorded",
     "dateIntro": "Choose the date, time, and equipment to inspect. This visit will use one of your {remaining} remaining visits.",
     "equipmentFallback": "Equipment #{id}",
-    "invalidDate": "Choose today or a future date."
+    "invalidDate": "Choose today or a future date.",
+    "scheduledStatus": "Scheduled"
   },
   "employees": {
     "s0": "Add employee",
