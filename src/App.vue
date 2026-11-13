@@ -90,12 +90,14 @@ function logout() {
           v-if="menuOpen"
           class="sidebar-overlay"
           @click="menuOpen = false"
+          aria-hidden="true"
       ></div>
 
       <aside
           id="app-navigation"
           class="sidebar"
           :class="{ 'sidebar-open': menuOpen }"
+          @keydown.esc="menuOpen = false"
       >
         <div class="sidebar-top">
           <div class="sidebar-brand">
@@ -138,6 +140,7 @@ function logout() {
               :class="{
               'navigation-active': route.path === item.path
             }"
+              :aria-current="route.path === item.path ? 'page' : undefined"
               @click="navigate(item.path)"
           >
             <i :class="item.icon"></i>
