@@ -202,8 +202,8 @@ async function pay() {
     <div class="cc-container">
 
       <PageHeader
-          eyebrow="COTIZACIONES Y PAGOS"
-          title="Cotizaciones"
+          :eyebrow="t('screens.quotations.s27')"
+          :title="t('screens.quotations.s28')"
           :description="isAdmin
             ? 'Revisa las cotizaciones del soporte técnico, apruébalas y realiza el pago desde un solo lugar.'
             : isTechnician
@@ -217,7 +217,7 @@ async function pay() {
             @click="openCreate"
         >
           <i class="pi pi-plus"></i>
-          Nueva cotización
+          {{ t('screens.quotations.s0') }}
         </button>
       </PageHeader>
       <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
@@ -227,49 +227,49 @@ async function pay() {
         </button>
       </div>
 
-      <section class="cc-stats" aria-label="Resumen de cotizaciones">
+      <section class="cc-stats" :aria-label="t('screens.quotations.s29')">
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Total de cotizaciones</span>
+            <span>{{ t('screens.quotations.s1') }}</span>
             <span class="cc-stat-icon"><i class="pi pi-file"></i></span>
           </div>
           <strong>{{ quotes.length }}</strong>
-          <span class="cc-stat-caption">Cotizaciones registradas</span>
+          <span class="cc-stat-caption">{{ t('screens.quotations.s2') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Pendientes</span>
+            <span>{{ t('screens.quotations.s3') }}</span>
             <span class="cc-stat-icon cc-icon-pending"><i class="pi pi-clock"></i></span>
           </div>
           <strong>{{ pendingCount }}</strong>
-          <span class="cc-stat-caption">Esperando aprobación</span>
+          <span class="cc-stat-caption">{{ t('screens.quotations.s4') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Por pagar</span>
+            <span>{{ t('screens.quotations.s5') }}</span>
             <span class="cc-stat-icon cc-icon-active"><i class="pi pi-wallet"></i></span>
           </div>
           <strong>{{ approvedCount }}</strong>
-          <span class="cc-stat-caption">Aprobadas sin pago</span>
+          <span class="cc-stat-caption">{{ t('screens.quotations.s6') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Pagadas</span>
+            <span>{{ t('screens.quotations.s7') }}</span>
             <span class="cc-stat-icon cc-icon-done"><i class="pi pi-check-circle"></i></span>
           </div>
           <strong>{{ paidCount }}</strong>
-          <span class="cc-stat-caption">Con recibo emitido</span>
+          <span class="cc-stat-caption">{{ t('screens.quotations.s8') }}</span>
         </article>
       </section>
 
       <section class="cc-card">
         <div class="cc-card-head">
           <div>
-            <h2>Historial de cotizaciones</h2>
-            <p>Consulta el detalle, el estado y el recibo de cada cotización.</p>
+            <h2>{{ t('screens.quotations.s9') }}</h2>
+            <p>{{ t('screens.quotations.s10') }}</p>
           </div>
 
           <div class="cc-search">
@@ -277,8 +277,8 @@ async function pay() {
             <input
                 v-model="search"
                 type="search"
-                placeholder="Buscar cotización..."
-                aria-label="Buscar cotizaciones"
+                :placeholder="t('screens.quotations.s30')"
+                :aria-label="t('screens.quotations.s31')"
             />
           </div>
         </div>
@@ -287,26 +287,26 @@ async function pay() {
           <table class="cc-table">
             <thead>
             <tr>
-              <th>Cotización</th>
-              <th>Ticket</th>
-              <th>Fecha</th>
-              <th>Ítems</th>
-              <th>Total</th>
-              <th>Estado</th>
-              <th class="cc-th-right">Acciones</th>
+              <th>{{ t('screens.quotations.s11') }}</th>
+              <th>{{ t('screens.quotations.s12') }}</th>
+              <th>{{ t('screens.quotations.s13') }}</th>
+              <th>{{ t('screens.quotations.s14') }}</th>
+              <th>{{ t('screens.quotations.s15') }}</th>
+              <th>{{ t('screens.quotations.s16') }}</th>
+              <th class="cc-th-right">{{ t('screens.quotations.s17') }}</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
-              <td colspan="7" class="cc-empty-cell">Cargando cotizaciones...</td>
+              <td colspan="7" class="cc-empty-cell">{{ t('screens.quotations.s18') }}</td>
             </tr>
 
             <tr v-else-if="filteredQuotes.length === 0">
               <td colspan="7" class="cc-empty-cell">
                 <div class="cc-empty">
                   <i class="pi pi-file"></i>
-                  <strong>No hay cotizaciones para mostrar</strong>
+                  <strong>{{ t('screens.quotations.s19') }}</strong>
                   <span>
                     {{ isTechnician
                       ? 'Crea una cotización desde uno de tus tickets asignados.'
@@ -334,7 +334,7 @@ async function pay() {
                   <button
                       class="cc-icon-btn"
                       type="button"
-                      title="Ver detalle"
+                      :title="t('screens.quotations.s32')"
                       :aria-label="`Ver detalle de la cotización ${quote.id}`"
                       @click="openDetail(quote)"
                   >
@@ -345,7 +345,7 @@ async function pay() {
                     <button
                         class="cc-icon-btn"
                         type="button"
-                        title="Aprobar"
+                        :title="t('screens.quotations.s33')"
                         :aria-label="`Aprobar cotización ${quote.id}`"
                         @click="approve(quote)"
                     >
@@ -355,7 +355,7 @@ async function pay() {
                     <button
                         class="cc-icon-btn cc-danger"
                         type="button"
-                        title="Rechazar"
+                        :title="t('screens.quotations.s34')"
                         :aria-label="`Rechazar cotización ${quote.id}`"
                         @click="reject(quote)"
                     >
@@ -367,7 +367,7 @@ async function pay() {
                       v-if="isAdmin && quote.status === 'APPROVED'"
                       class="cc-icon-btn"
                       type="button"
-                      title="Pagar"
+                      :title="t('screens.quotations.s35')"
                       :aria-label="`Pagar cotización ${quote.id}`"
                       @click="openPay(quote)"
                   >
@@ -400,8 +400,8 @@ async function pay() {
           <table class="cc-table">
             <thead>
             <tr>
-              <th>Descripción</th>
-              <th class="cc-th-right">Costo</th>
+              <th>{{ t('screens.quotations.s20') }}</th>
+              <th class="cc-th-right">{{ t('screens.quotations.s21') }}</th>
             </tr>
             </thead>
 
@@ -412,7 +412,7 @@ async function pay() {
             </tr>
 
             <tr>
-              <td><strong>Total</strong></td>
+              <td><strong>{{ t('screens.quotations.s15') }}</strong></td>
               <td class="cc-th-right"><strong>{{ formatMoney(selected.total) }}</strong></td>
             </tr>
             </tbody>
@@ -429,7 +429,7 @@ async function pay() {
 
         <div class="cc-banner cc-banner-warn" v-else-if="selected.status === 'REJECTED'">
           <i class="pi pi-exclamation-triangle"></i>
-          <span>Cotización rechazada. La orden de servicio permanece pausada.</span>
+          <span>{{ t('screens.quotations.s22') }}</span>
         </div>
 
         <div class="cc-banner cc-banner-info" v-else>
@@ -442,31 +442,31 @@ async function pay() {
     <!-- Nueva cotización (técnico) -->
     <pv-dialog
         v-model:visible="createVisible"
-        header="Nueva cotización"
+        :header="t('screens.quotations.s0')"
         modal
         :style="{ width: 'min(580px, 94vw)' }"
     >
       <form class="cc-form" @submit.prevent="saveQuote">
         <p class="cc-dialog-desc">
-          Selecciona el ticket y detalla los repuestos o servicios adicionales.
+          {{ t('screens.quotations.s23') }}
         </p>
 
         <div class="cc-field">
-          <label for="quote-ticket">Ticket</label>
+          <label for="quote-ticket">{{ t('screens.quotations.s12') }}</label>
           <pv-select
               v-model="form.ticketId"
               input-id="quote-ticket"
               :options="quotableTickets"
               option-label="label"
               option-value="id"
-              placeholder="Selecciona un ticket asignado"
+              :placeholder="t('screens.quotations.s36')"
               class="cc-full"
               :empty-message="'No tienes tickets disponibles para cotizar'"
           />
         </div>
 
         <div class="cc-field">
-          <label>Ítems</label>
+          <label>{{ t('screens.quotations.s14') }}</label>
 
           <div
               v-for="(item, index) in form.items"
@@ -477,7 +477,7 @@ async function pay() {
             <input
                 v-model="item.description"
                 class="cc-input"
-                placeholder="Descripción"
+                :placeholder="t('screens.quotations.s20')"
                 :aria-label="`Descripción del ítem ${index + 1}`"
             />
 
@@ -487,14 +487,14 @@ async function pay() {
                 type="number"
                 min="0.01"
                 step="0.01"
-                placeholder="Costo (S/)"
+                :placeholder="t('screens.quotations.s37')"
                 :aria-label="`Costo del ítem ${index + 1}`"
             />
 
             <button
                 class="cc-icon-btn cc-danger"
                 type="button"
-                title="Quitar ítem"
+                :title="t('screens.quotations.s38')"
                 :disabled="form.items.length === 1"
                 @click="removeItem(index)"
             >
@@ -504,7 +504,7 @@ async function pay() {
 
           <button class="cc-secondary-btn" type="button" style="align-self: flex-start" @click="addItem">
             <i class="pi pi-plus"></i>
-            Agregar ítem
+            {{ t('screens.quotations.s24') }}
           </button>
         </div>
 
@@ -515,7 +515,7 @@ async function pay() {
 
         <div class="cc-dialog-actions">
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="createVisible = false">
-            Cancelar
+            {{ t('screens.quotations.s25') }}
           </button>
 
           <button class="cc-primary-btn" type="submit" :disabled="saving || !canCreate">
@@ -540,8 +540,8 @@ async function pay() {
         </div>
 
         <div class="cc-field">
-          <label for="pay-holder">Titular de la tarjeta</label>
-          <input id="pay-holder" v-model="card.holder" class="cc-input" placeholder="Nombre del titular" required />
+          <label for="pay-holder">{{ t('screens.quotations.s26') }}</label>
+          <input id="pay-holder" v-model="card.holder" class="cc-input" :placeholder="t('screens.quotations.s39')" required />
         </div>
 
         <div class="cc-field">
@@ -562,7 +562,7 @@ async function pay() {
 
         <div class="cc-dialog-actions">
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="payVisible = false">
-            Cancelar
+            {{ t('screens.quotations.s25') }}
           </button>
 
           <button class="cc-primary-btn" type="submit" :disabled="saving">
