@@ -209,14 +209,13 @@ function formatDate(value) {
         <div class="header-content">
           <div class="eyebrow">
             <span class="eyebrow-dot"></span>
-            CENTRO DE SOPORTE
+            {{ t('screens.myTickets.s0') }}
           </div>
 
-          <h1>Mis solicitudes</h1>
+          <h1>{{ t('screens.myTickets.s1') }}</h1>
 
           <p>
-            Reporta incidencias, consulta tus solicitudes
-            y mantente informado sobre el soporte de tus equipos.
+            {{ t('screens.myTickets.s2') }}
           </p>
         </div>
 
@@ -226,7 +225,7 @@ function formatDate(value) {
             @click="openReportDialog"
         >
           <i class="pi pi-plus"></i>
-          Reportar falla
+          {{ t('screens.myTickets.s3') }}
         </button>
         <button
             type="button"
@@ -239,61 +238,61 @@ function formatDate(value) {
         </button>
       </header>
 
-      <section class="stats-grid" aria-label="Resumen de solicitudes">
+      <section class="stats-grid" :aria-label="t('screens.myTickets.s27')">
         <article class="stat-card">
           <div class="stat-top">
-            <span>Total de solicitudes</span>
+            <span>{{ t('screens.myTickets.s4') }}</span>
             <span class="stat-icon">
               <i class="pi pi-list"></i>
             </span>
           </div>
 
           <strong>{{ tickets.length }}</strong>
-          <span class="stat-caption">Solicitudes registradas</span>
+          <span class="stat-caption">{{ t('screens.myTickets.s5') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>Pendientes</span>
+            <span>{{ t('screens.myTickets.s6') }}</span>
             <span class="stat-icon pending-icon">
               <i class="pi pi-clock"></i>
             </span>
           </div>
 
           <strong>{{ pendingCount }}</strong>
-          <span class="stat-caption">Esperando asignación</span>
+          <span class="stat-caption">{{ t('screens.myTickets.s7') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>En atención</span>
+            <span>{{ t('screens.myTickets.s8') }}</span>
             <span class="stat-icon active-icon">
               <i class="pi pi-cog"></i>
             </span>
           </div>
 
           <strong>{{ activeCount }}</strong>
-          <span class="stat-caption">Solicitudes en seguimiento</span>
+          <span class="stat-caption">{{ t('screens.myTickets.s9') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>Finalizadas</span>
+            <span>{{ t('screens.myTickets.s10') }}</span>
             <span class="stat-icon completed-icon">
               <i class="pi pi-check-circle"></i>
             </span>
           </div>
 
           <strong>{{ completedCount }}</strong>
-          <span class="stat-caption">Solicitudes completadas</span>
+          <span class="stat-caption">{{ t('screens.myTickets.s11') }}</span>
         </article>
       </section>
 
       <section class="tickets-card">
         <div class="section-heading">
           <div>
-            <h2>Historial de solicitudes</h2>
-            <p>Consulta el estado de tus reportes técnicos.</p>
+            <h2>{{ t('screens.myTickets.s12') }}</h2>
+            <p>{{ t('screens.myTickets.s13') }}</p>
           </div>
 
           <div class="search-box">
@@ -301,8 +300,8 @@ function formatDate(value) {
             <input
                 v-model="search"
                 type="search"
-                placeholder="Buscar solicitud..."
-                aria-label="Buscar solicitudes"
+                :placeholder="t('screens.myTickets.s28')"
+                :aria-label="t('screens.myTickets.s29')"
             />
           </div>
         </div>
@@ -311,18 +310,18 @@ function formatDate(value) {
           <table class="tickets-table">
             <thead>
             <tr>
-              <th>Ticket</th>
-              <th>Equipo</th>
-              <th>Categoría</th>
-              <th>Estado</th>
-              <th class="actions-heading">Acciones</th>
+              <th>{{ t('screens.myTickets.s14') }}</th>
+              <th>{{ t('screens.myTickets.s15') }}</th>
+              <th>{{ t('screens.myTickets.s16') }}</th>
+              <th>{{ t('screens.myTickets.s17') }}</th>
+              <th class="actions-heading">{{ t('screens.myTickets.s18') }}</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
               <td colspan="5" class="empty-cell">
-                Cargando solicitudes...
+                {{ t('screens.myTickets.s19') }}
               </td>
             </tr>
 
@@ -330,9 +329,9 @@ function formatDate(value) {
               <td colspan="5" class="empty-cell">
                 <div class="empty-state">
                   <i class="pi pi-inbox"></i>
-                  <strong>No hay solicitudes para mostrar</strong>
+                  <strong>{{ t('screens.myTickets.s20') }}</strong>
                   <span>
-                      Cuando registres una incidencia, aparecerá aquí.
+                      {{ t('screens.myTickets.s21') }}
                     </span>
                 </div>
               </td>
@@ -379,7 +378,7 @@ function formatDate(value) {
                   <button
                       class="icon-button"
                       type="button"
-                      title="Ver seguimiento"
+                      :title="t('screens.myTickets.s30')"
                       :aria-label="`Ver seguimiento del ticket ${ticket.id}`"
                       @click="openTimeline(ticket)"
                   >
@@ -390,7 +389,7 @@ function formatDate(value) {
                       v-if="ticket.status === 'Pendiente de Asignación'"
                       class="icon-button danger-button"
                       type="button"
-                      title="Cancelar solicitud"
+                      :title="t('screens.myTickets.s31')"
                       :aria-label="`Cancelar ticket ${ticket.id}`"
                       @click="cancel(ticket)"
                   >
@@ -420,18 +419,17 @@ function formatDate(value) {
     <!-- Formulario para reportar una falla -->
     <pv-dialog
         v-model:visible="visible"
-        header="Reportar una falla"
+        :header="t('screens.myTickets.s32')"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
       <form class="report-form" @submit.prevent="save">
         <p class="dialog-description">
-          Completa los datos del problema para solicitar
-          asistencia técnica.
+          {{ t('screens.myTickets.s22') }}
         </p>
 
         <div class="form-field">
-          <label for="ticket-equipment">Equipo afectado</label>
+          <label for="ticket-equipment">{{ t('screens.myTickets.s23') }}</label>
 
           <pv-select
               v-model="form.equipmentId"
@@ -439,14 +437,14 @@ function formatDate(value) {
               :options="equipment.equipments"
               option-label="name"
               option-value="id"
-              placeholder="Selecciona tu equipo"
+              :placeholder="t('screens.myTickets.s33')"
               class="full-width"
               required
           />
         </div>
 
         <div class="form-field">
-          <label for="ticket-category">Categoría</label>
+          <label for="ticket-category">{{ t('screens.myTickets.s16') }}</label>
 
           <pv-select
               v-model="form.category"
@@ -454,7 +452,7 @@ function formatDate(value) {
               :options="categoryOptions"
               option-label="label"
               option-value="value"
-              placeholder="Selecciona una categoría"
+              :placeholder="t('screens.myTickets.s34')"
               class="full-width"
               required
           />
@@ -462,14 +460,14 @@ function formatDate(value) {
 
         <div class="form-field">
           <label for="ticket-description">
-            Descripción del problema
+            {{ t('screens.myTickets.s24') }}
           </label>
 
           <pv-textarea
               id="ticket-description"
               v-model="form.description"
               rows="5"
-              placeholder="Describe qué sucede con tu equipo..."
+              :placeholder="t('screens.myTickets.s35')"
               class="full-width"
               required
           />
@@ -482,7 +480,7 @@ function formatDate(value) {
               :disabled="saving"
               @click="visible = false"
           >
-            Cancelar
+            {{ t('screens.myTickets.s25') }}
           </button>
 
           <button
@@ -509,7 +507,7 @@ function formatDate(value) {
             v-if="!selected.timeline?.length"
             class="timeline-empty"
         >
-          Aún no hay movimientos registrados.
+          {{ t('screens.myTickets.s26') }}
         </div>
 
         <div
