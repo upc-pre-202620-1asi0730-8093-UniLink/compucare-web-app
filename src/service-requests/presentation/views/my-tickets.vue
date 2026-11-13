@@ -3,6 +3,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import { useConfirm } from 'primevue'
 import useTicketStore from '../../application/ticket.store.js'
 import useEquipmentStore from '../../../equipment/application/equipment.store.js'
@@ -13,6 +14,7 @@ const equipment = useEquipmentStore()
 const confirm = useConfirm()
 const { ok, fail } = useFeedback()
 const { t } = useI18n({ useScope: 'global' })
+const { ticketStatusLabel, categoryLabel } = useDomainLabels()
 const { refresh, refreshing } = useAutoRefresh(() => store.fetchTickets())
 
 const categories = [
@@ -22,6 +24,8 @@ const categories = [
   'Impresión',
   'Otro'
 ]
+
+const categoryOptions = computed(() => categories.map(value => ({ value, label: categoryLabel(value) })))
 
 const visible = ref(false)
 const timelineVisible = ref(false)
@@ -358,7 +362,7 @@ function formatDate(value) {
               </td>
 
               <td>
-                {{ ticket.category || 'Sin categoría' }}
+                {{ categoryLabel(ticket.category) }}
               </td>
 
               <td>
@@ -366,7 +370,7 @@ function formatDate(value) {
                       class="status-badge"
                       :class="statusClass(ticket.status)"
                   >
-                    {{ ticket.status || 'Sin estado' }}
+                    {{ ticketStatusLabel(ticket.status) }}
                   </span>
               </td>
 
@@ -447,7 +451,9 @@ function formatDate(value) {
           <pv-select
               v-model="form.category"
               input-id="ticket-category"
-              :options="categories"
+              :options="categoryOptions"
+              option-label="label"
+              option-value="value"
               placeholder="Selecciona una categoría"
               class="full-width"
               required
@@ -514,7 +520,7 @@ function formatDate(value) {
           <span class="timeline-dot"></span>
 
           <div class="timeline-details">
-            <strong>{{ item.status }}</strong>
+            <strong>{{ ticketStatusLabel(item.status) }}</strong>
             <small>{{ formatDate(item.at) }}</small>
           </div>
         </div>
