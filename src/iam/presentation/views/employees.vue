@@ -59,8 +59,8 @@ async function save() {
       position: form.value.position.trim()
     })
 
-    tempPassword.value = created.tempPassword   // Simula la invitación por correo
-    ok('Empleado registrado e invitado por correo')
+    tempPassword.value = import.meta.env.DEV ? (created.tempPassword ?? null) : null // demo credentials must not appear in production
+    ok(t('screens.employees.registered'))
     visible.value = false
   } catch (error) {
     fail(error)   // Correo duplicado -> 409
@@ -88,7 +88,7 @@ async function save() {
       <div v-if="tempPassword" class="cc-banner cc-banner-info" role="status">
         <i class="pi pi-info-circle"></i>
         <span>
-          Clave temporal enviada (solo desarrollo): <strong>{{ tempPassword }}</strong>
+          {{ t('screens.employees.demoToken') }} <strong>{{ tempPassword }}</strong>
         </span>
       </div>
 
@@ -96,7 +96,7 @@ async function save() {
         <div class="cc-card-head">
           <div>
             <h2>{{ t('screens.employees.s1') }}</h2>
-            <p>{{ employees.length }} empleado(s) en tu empresa.</p>
+            <p>{{ t('screens.employees.count', { count: employees.length }) }}</p>
           </div>
 
           <div class="cc-search">
@@ -155,7 +155,7 @@ async function save() {
         </div>
 
         <div class="cc-table-footer">
-          Mostrando {{ filteredEmployees.length }} de {{ employees.length }} empleados
+          {{ t('screens.employees.showing', { shown: filteredEmployees.length, total: employees.length }) }}
         </div>
       </section>
 
@@ -170,7 +170,7 @@ async function save() {
     >
       <form class="cc-form" @submit.prevent="save">
         <p class="cc-dialog-desc">
-          Se enviará una invitación al correo del empleado con una clave temporal.
+          {{ t('screens.employees.inviteNote') }}
         </p>
 
         <div class="cc-field">
@@ -195,7 +195,7 @@ async function save() {
 
           <button class="cc-primary-btn" type="submit" :disabled="saving">
             <i class="pi pi-send"></i>
-            {{ saving ? 'Guardando...' : 'Registrar e invitar' }}
+            {{ saving ? t('screens.employees.saving') : t('screens.employees.create') }}
           </button>
         </div>
       </form>
