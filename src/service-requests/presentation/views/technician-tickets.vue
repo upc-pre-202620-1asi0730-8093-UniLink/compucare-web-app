@@ -103,7 +103,7 @@ async function start(ticket) {
 
   try {
     await store.startDiagnosis(ticket.id)
-    ok('Diagnóstico iniciado correctamente')
+    ok(t('screens.technicianTickets.started'))
   } catch (error) {
     fail(error)
   } finally {
@@ -151,7 +151,7 @@ async function close() {
       hours: Number(report.value.hours)
     })
 
-    ok('Ticket atendido y horas registradas')
+    ok(t('screens.technicianTickets.closed'))
     closeVisible.value = false
     target.value = null
   } catch (error) {
@@ -200,7 +200,7 @@ async function sendQuote() {
       }))
     })
 
-    ok('Cotización enviada para aprobación')
+    ok(t('screens.technicianTickets.quoteSent'))
     quoteVisible.value = false
     target.value = null
   } catch (error) {
@@ -374,14 +374,14 @@ function statusClass(status) {
                     </span>
 
                   <span>
-                      {{ ticket.equipmentName || 'Equipo registrado' }}
+                      {{ ticket.equipmentName || t('screens.technicianTickets.equipmentFallback') }}
                     </span>
                 </div>
               </td>
 
               <td>
                   <span class="description-text">
-                    {{ ticket.description || 'Sin descripción' }}
+                    {{ ticket.description || t('screens.technicianTickets.descriptionFallback') }}
                   </span>
               </td>
 
@@ -477,14 +477,13 @@ function statusClass(status) {
 
     <pv-dialog
         v-model:visible="closeVisible"
-        header="Informe técnico"
+        :header="t('screens.technicianTickets.technicalReport')"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
       <form class="dialog-form" @submit.prevent="close">
         <p class="dialog-description">
-          Registra el diagnóstico, los trabajos realizados
-          y el tiempo empleado.
+          {{ t('screens.technicianTickets.closeDescription') }}
         </p>
 
         <div class="form-field">
@@ -507,7 +506,7 @@ function statusClass(status) {
               id="work-done"
               v-model="report.workDone"
               rows="3"
-              placeholder="Describe la solución aplicada"
+              :placeholder="t('screens.technicianTickets.resolutionPlaceholder')"
               class="full-width"
               required
           />
@@ -542,7 +541,7 @@ function statusClass(status) {
               type="submit"
               :disabled="processing"
           >
-            {{ processing ? 'Registrando...' : 'Registrar y cerrar' }}
+            {{ processing ? t('screens.technicianTickets.processing') : t('screens.technicianTickets.finish') }}
           </button>
         </div>
       </form>
@@ -550,14 +549,13 @@ function statusClass(status) {
 
     <pv-dialog
         v-model:visible="quoteVisible"
-        header="Cotización de repuestos"
+        :header="t('screens.technicianTickets.quoteTitle')"
         modal
         :style="{ width: 'min(540px, 94vw)' }"
     >
       <form class="dialog-form" @submit.prevent="sendQuote">
         <p class="dialog-description">
-          Registra los repuestos necesarios
-          y sus costos para solicitar aprobación.
+          {{ t('screens.technicianTickets.quoteDescription') }}
         </p>
 
         <div
@@ -625,7 +623,7 @@ function statusClass(status) {
               type="submit"
               :disabled="processing"
           >
-            {{ processing ? 'Enviando...' : 'Enviar cotización' }}
+            {{ processing ? t('screens.technicianTickets.sending') : t('screens.technicianTickets.sendQuote') }}
           </button>
         </div>
       </form>
