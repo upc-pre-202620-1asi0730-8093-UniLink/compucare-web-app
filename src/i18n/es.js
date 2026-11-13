@@ -32,7 +32,10 @@ export default {
         maintenance: 'Mantenimientos',
         employees: 'Empleados',
         myProfile: 'Mi perfil',
-        logout: 'Cerrar sesión'
+        logout: 'Cerrar sesión',
+        openMenu: 'Abrir menú de navegación',
+        closeMenu: 'Cerrar menú de navegación',
+        userFallback: 'Usuario CompuCare'
     },
     roles: {
         employee: 'Empleado',
@@ -54,7 +57,9 @@ export default {
         forgotPassword: '¿Olvidaste tu contraseña?',
         registerCompany: 'Registrar empresa',
         needHelp: '¿Necesitas ayuda para acceder?',
-        contactAdmin: 'Contacta al administrador de tu empresa.'
+        contactAdmin: 'Contacta al administrador de tu empresa.',
+        loginSuccessNoPanel: 'Inicio de sesión correcto. Tu panel de usuario todavía no está disponible.',
+        loginError: 'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.'
     },
     tickets: {
         myTickets: 'Mis solicitudes',
