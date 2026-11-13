@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import useSubscriptionStore from '../../application/subscription.store.js'
 import useEquipmentStore from '../../../equipment/application/equipment.store.js'
 import useQuotationStore from '../../../quotations/application/quotation.store.js'
@@ -13,7 +12,6 @@ import PageHeader from '../../../shared/presentation/page-header.vue'
 import PageFooter from '../../../shared/presentation/page-footer.vue'
 
 const router = useRouter()
-const { t } = useI18n({ useScope: 'global' })
 const subscriptions = useSubscriptionStore()
 const equipment = useEquipmentStore()
 const quotations = useQuotationStore()
@@ -40,11 +38,11 @@ const recentTickets = computed(() =>
         .slice(0, 5)
 )
 
-const shortcuts = computed(() => [
-  { label: t('dashboard.equipmentShortcut'), text: t('dashboard.equipmentShortcutText'), icon: 'pi pi-desktop', path: '/equipments' },
-  { label: t('dashboard.quotesShortcut'), text: t('dashboard.quotesShortcutText'), icon: 'pi pi-file', path: '/quotations' },
-  { label: t('dashboard.maintenanceShortcut'), text: t('dashboard.maintenanceShortcutText'), icon: 'pi pi-calendar', path: '/maintenances' }
-])
+const shortcuts = [
+  { label: 'Equipos', text: 'Inventario y asignaciones', icon: 'pi pi-desktop', path: '/equipments' },
+  { label: 'Cotizaciones', text: 'Aprueba y paga', icon: 'pi pi-file', path: '/quotations' },
+  { label: 'Mantenimientos', text: 'Agenda visitas preventivas', icon: 'pi pi-calendar', path: '/maintenances' }
+]
 
 onMounted(async () => {
   loading.value = true
@@ -81,9 +79,9 @@ function statusClass(status) {
     <div class="cc-container">
 
       <PageHeader
-          :eyebrow="t('dashboard.eyebrow')"
-          :title="t('dashboard.greeting', { name: firstName })"
-          :description="t('dashboard.description')"
+          eyebrow="PANEL DE LA EMPRESA"
+          :title="`Hola, ${firstName}`"
+          description="Este es el resumen del soporte técnico de tu empresa: horas disponibles, equipos, tickets y cotizaciones."
       />
 
       <div
@@ -93,52 +91,52 @@ function statusClass(status) {
       >
         <i class="pi pi-exclamation-triangle"></i>
         <span>
-          {{ t('dashboard.usedHours', { percent: balance.percentUsed }) }}
-          <router-link to="/subscription">{{ t('dashboard.reviewPlan') }}</router-link>.
+          Has consumido el {{ balance.percentUsed }}% de tu bolsa de horas.
+          <router-link to="/subscription">Revisa tu plan</router-link>.
         </span>
       </div>
 
-      <section class="cc-stats" :aria-label="t('dashboard.overall')">
+      <section class="cc-stats" aria-label="Resumen general">
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('dashboard.hoursRemaining') }}</span>
+            <span>Horas restantes</span>
             <span class="cc-stat-icon cc-icon-done"><i class="pi pi-clock"></i></span>
           </div>
           <strong>{{ balance ? `${balance.hoursRemaining} h` : '—' }}</strong>
           <span class="cc-stat-caption">
-            {{ balance ? t('dashboard.planName', { name: balance.planName }) : t('dashboard.noSubscription') }}
+            {{ balance ? `Plan ${balance.planName}` : 'Sin suscripción activa' }}
           </span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('dashboard.equipment') }}</span>
+            <span>Equipos</span>
             <span class="cc-stat-icon"><i class="pi pi-desktop"></i></span>
           </div>
           <strong>{{ equipment.equipments.length }}</strong>
-          <span class="cc-stat-caption">{{ t('dashboard.registeredDevices') }}</span>
+          <span class="cc-stat-caption">Equipos registrados</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('dashboard.openTickets') }}</span>
+            <span>Tickets abiertos</span>
             <span class="cc-stat-icon cc-icon-active"><i class="pi pi-ticket"></i></span>
           </div>
           <strong>{{ openTickets.length }}</strong>
-          <span class="cc-stat-caption">{{ t('dashboard.underService') }}</span>
+          <span class="cc-stat-caption">En atención</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('dashboard.pendingQuotes') }}</span>
+            <span>Cotizaciones pendientes</span>
             <span class="cc-stat-icon cc-icon-pending"><i class="pi pi-file"></i></span>
           </div>
           <strong>{{ pendingQuotes.length }}</strong>
-          <span class="cc-stat-caption">{{ t('dashboard.awaitApproval') }}</span>
+          <span class="cc-stat-caption">Esperan tu aprobación</span>
         </article>
       </section>
 
-      <section class="cc-grid" style="margin-bottom: 24px" :aria-label="t('dashboard.quickAccess')">
+      <section class="cc-grid" style="margin-bottom: 24px" aria-label="Accesos rápidos">
         <button
             v-for="item in shortcuts"
             :key="item.path"
@@ -158,8 +156,8 @@ function statusClass(status) {
       <section class="cc-card">
         <div class="cc-card-head">
           <div>
-            <h2>{{ t('dashboard.recentTickets') }}</h2>
-            <p>{{ t('dashboard.recentTicketsDescription') }}</p>
+            <h2>Últimos tickets</h2>
+            <p>Las solicitudes más recientes de tu empresa.</p>
           </div>
         </div>
 
@@ -167,32 +165,32 @@ function statusClass(status) {
           <table class="cc-table">
             <thead>
             <tr>
-              <th>{{ t('dashboard.ticket') }}</th>
-              <th>{{ t('dashboard.equipment') }}</th>
-              <th>{{ t('dashboard.employee') }}</th>
-              <th>{{ t('dashboard.date') }}</th>
-              <th>{{ t('dashboard.status') }}</th>
+              <th>Ticket</th>
+              <th>Equipo</th>
+              <th>Empleado</th>
+              <th>Fecha</th>
+              <th>Estado</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
-              <td colspan="5" class="cc-empty-cell">{{ t('dashboard.loading') }}</td>
+              <td colspan="5" class="cc-empty-cell">Cargando información...</td>
             </tr>
 
             <tr v-else-if="recentTickets.length === 0">
               <td colspan="5" class="cc-empty-cell">
                 <div class="cc-empty">
                   <i class="pi pi-inbox"></i>
-                  <strong>{{ t('dashboard.emptyTitle') }}</strong>
-                  <span>{{ t('dashboard.emptyDescription') }}</span>
+                  <strong>Aún no hay tickets</strong>
+                  <span>Cuando tus empleados reporten una falla, aparecerá aquí.</span>
                 </div>
               </td>
             </tr>
 
             <tr v-else v-for="ticket in recentTickets" :key="ticket.id">
               <td><span class="cc-code">#{{ ticket.id }}</span></td>
-              <td>{{ ticket.equipmentName ?? t('dashboard.registeredEquipment') }}</td>
+              <td>{{ ticket.equipmentName ?? 'Equipo registrado' }}</td>
               <td>{{ ticket.employeeName ?? '—' }}</td>
               <td>{{ formatDate(ticket.createdAt) }}</td>
               <td>
