@@ -1,5 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import { useConfirm } from 'primevue'
 import useQuotationStore from '../../application/quotation.store.js'
 import useTicketStore from '../../../service-requests/application/ticket.store.js'
@@ -14,16 +17,12 @@ const tickets = useTicketStore()
 const iam = useIamStore()
 const confirm = useConfirm()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
+const { quotationStatusLabel } = useDomainLabels()
+const { refresh, refreshing } = useAutoRefresh(() => store.fetchQuotes())
 
 const isAdmin = computed(() => ['admin', 'company_manager'].includes(iam.role))
 const isTechnician = computed(() => iam.role === 'technician')
-
-const statusLabels = {
-  PENDING: 'Pendiente',
-  APPROVED: 'Aprobada',
-  REJECTED: 'Rechazada',
-  PAID: 'Pagada'
-}
 
 const statusClasses = {
   PENDING: 'cc-badge-pending',
@@ -42,7 +41,7 @@ const payVisible = ref(false)
 const selected = ref(null)
 
 const form = ref({ ticketId: null, items: [{ description: '', cost: null }] })
-const card = ref({ holder: '', number: '', expiry: '', cvv: '' })
+const card = ref({ holder: '', last4: '' })
 
 const quotes = computed(() => store.quotes || [])
 
@@ -52,7 +51,7 @@ const filteredQuotes = computed(() => {
   if (!query) return quotes.value
 
   return quotes.value.filter(q =>
-      [q.id, q.ticketId, statusLabels[q.status], q.total]
+      [q.id, q.ticketId, quotationStatusLabel(q.status), q.total]
           .some(value => String(value ?? '').toLowerCase().includes(query))
   )
 })
@@ -166,17 +165,16 @@ async function changeStatus(quote, status, message) {
 
 function openPay(quote) {
   selected.value = quote
-  card.value = { holder: '', number: '', expiry: '', cvv: '' }
+  card.value = { holder: '', last4: '' }
   payVisible.value = true
 }
 
 async function pay() {
   if (saving.value) return
 
-  const digits = card.value.number.replace(/\D/g, '')
-
-  if (digits.length < 4) {
-    fail(new Error('Ingresa un número de tarjeta de prueba válido'))
+  const digits = card.value.last4.trim()
+  if (!/^\d{4}$/.test(digits) || !card.value.holder.trim()) {
+    fail(new Error(t('common.invalidDemoPayment')))
     return
   }
 
@@ -186,7 +184,7 @@ async function pay() {
     // Pago simulado: solo se envía el titular y los últimos 4 dígitos
     await store.pay(selected.value.id, {
       holder: card.value.holder.trim(),
-      last4: digits.slice(-4)
+      last4: digits
     })
 
     ok('Pago registrado correctamente')
@@ -222,6 +220,12 @@ async function pay() {
           Nueva cotización
         </button>
       </PageHeader>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="cc-secondary-btn" type="button" :disabled="refreshing" @click="refresh().catch(fail)">
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ refreshing ? t('common.refreshing') : t('common.refresh') }}
+        </button>
+      </div>
 
       <section class="cc-stats" aria-label="Resumen de cotizaciones">
         <article class="cc-stat">
@@ -321,7 +325,7 @@ async function pay() {
 
               <td>
                 <span class="cc-badge" :class="statusClasses[quote.status] ?? 'cc-badge-default'">
-                  {{ statusLabels[quote.status] ?? quote.status }}
+                  {{ quotationStatusLabel(quote.status) }}
                 </span>
               </td>
 
@@ -430,7 +434,7 @@ async function pay() {
 
         <div class="cc-banner cc-banner-info" v-else>
           <i class="pi pi-info-circle"></i>
-          <span>Estado actual: {{ statusLabels[selected.status] ?? selected.status }}.</span>
+          <span>Estado actual: {{ quotationStatusLabel(selected.status) }}.</span>
         </div>
       </div>
     </pv-dialog>
@@ -532,10 +536,7 @@ async function pay() {
       <form class="cc-form" @submit.prevent="pay">
         <div class="cc-banner cc-banner-info" style="margin-bottom: 0">
           <i class="pi pi-info-circle"></i>
-          <span>
-            Pago simulado de <strong>{{ formatMoney(selected?.total) }}</strong>.
-            Usa una tarjeta de prueba: solo se guardan el titular y los últimos 4 dígitos.
-          </span>
+          <span>{{ t('common.demoPaymentNote') }} <strong>{{ formatMoney(selected?.total) }}</strong>.</span>
         </div>
 
         <div class="cc-field">
@@ -544,36 +545,19 @@ async function pay() {
         </div>
 
         <div class="cc-field">
-          <label for="pay-number">Número de tarjeta de prueba</label>
+          <label for="pay-last4">{{ t('common.testCardLast4') }}</label>
           <input
-              id="pay-number"
-              v-model="card.number"
+              id="pay-last4"
+              v-model="card.last4"
               class="cc-input"
               inputmode="numeric"
-              maxlength="16"
-              placeholder="4111111111111111"
+              pattern="[0-9]{4}"
+              minlength="4"
+              maxlength="4"
+              placeholder="1234"
+              autocomplete="off"
               required
           />
-        </div>
-
-        <div class="cc-form-row">
-          <div class="cc-field">
-            <label for="pay-expiry">Vencimiento</label>
-            <input id="pay-expiry" v-model="card.expiry" class="cc-input" placeholder="MM/AA" required />
-          </div>
-
-          <div class="cc-field">
-            <label for="pay-cvv">CVV</label>
-            <input
-                id="pay-cvv"
-                v-model="card.cvv"
-                class="cc-input"
-                inputmode="numeric"
-                maxlength="4"
-                placeholder="123"
-                required
-            />
-          </div>
         </div>
 
         <div class="cc-dialog-actions">
