@@ -18,6 +18,7 @@ import App from './App.vue'
 import router from './router/index.js'
 import i18n from './i18n/index.js'
 
+import 'primeicons/primeicons.css'
 import './style.css'
 import './shared/presentation/ui.css'
 
