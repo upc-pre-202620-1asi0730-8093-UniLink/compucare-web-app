@@ -134,6 +134,37 @@ export default {
         emptyDescription: "When your employees report an issue, it will appear here.",
         registeredEquipment: "Registered equipment",
     },
+    domain: {
+        "unspecified": "Not specified",
+        "ticket": {
+            "pending": "Pending assignment",
+            "assigned": "Assigned",
+            "diagnosis": "Under diagnosis",
+            "progress": "In progress",
+            "attended": "Attended",
+            "resolved": "Resolved",
+            "completed": "Completed",
+            "closed": "Closed",
+            "cancelled": "Cancelled"
+        },
+        "quotation": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "paid": "Paid"
+        },
+        "equipment": {
+            "operational": "Operational",
+            "repair": "Under repair"
+        },
+        "category": {
+            "hardware": "Hardware",
+            "software": "Software",
+            "network": "Network",
+            "printing": "Printing",
+            "other": "Other"
+        }
+    },
     tickets: {
         myTickets: 'My requests',
         manageTickets: 'Ticket management',
