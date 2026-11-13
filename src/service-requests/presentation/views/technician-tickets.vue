@@ -3,6 +3,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import useTicketStore from '../../application/ticket.store.js'
 import useQuotationStore from '../../../quotations/application/quotation.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
@@ -11,6 +12,7 @@ const store = useTicketStore()
 const quotes = useQuotationStore()
 const { ok, fail } = useFeedback()
 const { t } = useI18n({ useScope: 'global' })
+const { ticketStatusLabel, quotationStatusLabel } = useDomainLabels()
 const { refresh, refreshing } = useAutoRefresh(() => Promise.all([store.fetchTickets(), quotes.fetchQuotes()]))
 
 const loading = ref(false)
@@ -90,7 +92,7 @@ function quoteIsBlocked(ticketId) {
 function quoteStatusOf(ticketId) {
   return (quotes.quotes || [])
       .filter(quote => quote.ticketId === ticketId)
-      .map(quote => quote.status)
+      .map(quote => quotationStatusLabel(quote.status))
       .join(', ')
 }
 
@@ -391,7 +393,7 @@ function statusClass(status) {
                         class="status-badge"
                         :class="statusClass(ticket.status)"
                     >
-                      {{ ticket.status }}
+                      {{ ticketStatusLabel(ticket.status) }}
                     </span>
 
                   <span
