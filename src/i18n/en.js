@@ -16,7 +16,10 @@ export default {
         description: 'Description',
         back: 'Back',
         send: 'Send',
-        language: 'Language'
+        language: 'Language',
+        refresh: 'Refresh',
+        refreshing: 'Refreshing...',
+        unresolvedQuotation: 'This request has a pending or rejected quotation. Resolve it before closing the ticket.'
     },
     navigation: {
         mainMenu: 'MAIN MENU',
