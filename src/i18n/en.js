@@ -135,6 +135,7 @@ export default {
         registeredEquipment: "Registered equipment",
     },
     domain: {
+        "allStatuses": "All statuses",
         "unspecified": "Not specified",
         "ticket": {
             "pending": "Pending assignment",
