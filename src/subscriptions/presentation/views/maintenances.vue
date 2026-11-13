@@ -1,5 +1,4 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref } from 'vue'
 import useSubscriptionStore from '../../application/subscription.store.js'
 import useEquipmentStore from '../../../equipment/application/equipment.store.js'
@@ -11,7 +10,6 @@ import PageFooter from '../../../shared/presentation/page-footer.vue'
 const store = useSubscriptionStore()
 const equipment = useEquipmentStore()
 const { ok, fail } = useFeedback()
-const { t } = useI18n({ useScope: 'global' })
 
 const loading = ref(false)
 const saving = ref(false)
@@ -22,11 +20,7 @@ const maintenances = computed(() => store.maintenances || [])
 const remaining = computed(() => store.balance?.preventiveRemaining ?? 0)
 const canSchedule = computed(() => !!store.balance && remaining.value > 0)
 
-const today = computed(() => {
-  const now = new Date()
-  const two = value => String(value).padStart(2, '0')
-  return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`
-})
+const today = computed(() => new Date().toISOString().slice(0, 10))
 
 const sortedMaintenances = computed(() =>
     [...maintenances.value].sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`))
@@ -50,7 +44,7 @@ onMounted(async () => {
 
 function equipmentNames(ids) {
   return ids
-      .map(id => equipment.equipments.find(e => e.id === id)?.name ?? t('screens.maintenances.equipmentFallback', { id }))
+      .map(id => equipment.equipments.find(e => e.id === id)?.name ?? `Equipo #${id}`)
       .join(', ')
 }
 
@@ -68,10 +62,6 @@ async function save() {
   if (saving.value) return
 
   if (!form.value.date || !form.value.time || !form.value.equipmentIds.length) return
-  if (form.value.date < today.value) {
-    fail(new Error(t('screens.maintenances.invalidDate')))
-    return
-  }
 
   saving.value = true
 
@@ -82,7 +72,7 @@ async function save() {
       equipmentIds: form.value.equipmentIds
     })
 
-    ok(t('screens.maintenances.scheduled'))
+    ok('Mantenimiento preventivo agendado')
     visible.value = false
   } catch (error) {
     fail(error)
@@ -97,9 +87,9 @@ async function save() {
     <div class="cc-container">
 
       <PageHeader
-          :eyebrow="t('screens.maintenances.s22')"
-          :title="t('screens.maintenances.s23')"
-          :description="t('screens.maintenances.s24')"
+          eyebrow="MANTENIMIENTO PREVENTIVO"
+          title="Mantenimientos"
+          description="Agenda las visitas preventivas incluidas en tu plan y consulta las ya programadas."
       >
         <button
             class="cc-primary-btn"
@@ -108,54 +98,54 @@ async function save() {
             @click="openSchedule"
         >
           <i class="pi pi-calendar-plus"></i>
-          {{ t('screens.maintenances.s0') }}
+          Agendar visita
         </button>
       </PageHeader>
 
       <div v-if="!loading && !store.balance" class="cc-banner cc-banner-warn" role="status">
         <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ t('screens.maintenances.s1') }}</span>
+        <span>Necesitas una suscripción activa para agendar mantenimientos preventivos.</span>
       </div>
 
       <div v-else-if="!loading && remaining === 0" class="cc-banner cc-banner-warn" role="status">
         <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ t('screens.maintenances.s2') }}</span>
+        <span>Ya usaste todas las visitas preventivas de tu plan. Renueva tu suscripción para obtener más.</span>
       </div>
 
-      <section class="cc-stats" :aria-label="t('screens.maintenances.s25')">
+      <section class="cc-stats" aria-label="Resumen de mantenimientos">
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('screens.maintenances.s3') }}</span>
+            <span>Visitas disponibles</span>
             <span class="cc-stat-icon cc-icon-done"><i class="pi pi-calendar"></i></span>
           </div>
           <strong>{{ remaining }}</strong>
-          <span class="cc-stat-caption">{{ t('screens.maintenances.s4') }}</span>
+          <span class="cc-stat-caption">Cupos preventivos restantes</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('screens.maintenances.s5') }}</span>
+            <span>Visitas usadas</span>
             <span class="cc-stat-icon cc-icon-active"><i class="pi pi-check-square"></i></span>
           </div>
           <strong>{{ store.balance?.preventiveUsed ?? 0 }}</strong>
-          <span class="cc-stat-caption">{{ t('screens.maintenances.s6') }}</span>
+          <span class="cc-stat-caption">Del periodo actual</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>{{ t('screens.maintenances.s7') }}</span>
+            <span>Agendados</span>
             <span class="cc-stat-icon"><i class="pi pi-list"></i></span>
           </div>
           <strong>{{ maintenances.length }}</strong>
-          <span class="cc-stat-caption">{{ t('screens.maintenances.s8') }}</span>
+          <span class="cc-stat-caption">Mantenimientos registrados</span>
         </article>
       </section>
 
       <section class="cc-card">
         <div class="cc-card-head">
           <div>
-            <h2>{{ t('screens.maintenances.s9') }}</h2>
-            <p>{{ t('screens.maintenances.s10') }}</p>
+            <h2>Visitas programadas</h2>
+            <p>Cada visita consume un cupo preventivo de tu plan.</p>
           </div>
         </div>
 
@@ -163,25 +153,25 @@ async function save() {
           <table class="cc-table">
             <thead>
             <tr>
-              <th>{{ t('screens.maintenances.s11') }}</th>
-              <th>{{ t('screens.maintenances.s12') }}</th>
-              <th>{{ t('screens.maintenances.s13') }}</th>
-              <th>{{ t('screens.maintenances.s14') }}</th>
-              <th>{{ t('screens.maintenances.s15') }}</th>
+              <th>Visita</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Equipos</th>
+              <th>Estado</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
-              <td colspan="5" class="cc-empty-cell">{{ t('screens.maintenances.s16') }}</td>
+              <td colspan="5" class="cc-empty-cell">Cargando mantenimientos...</td>
             </tr>
 
             <tr v-else-if="sortedMaintenances.length === 0">
               <td colspan="5" class="cc-empty-cell">
                 <div class="cc-empty">
                   <i class="pi pi-calendar"></i>
-                  <strong>{{ t('screens.maintenances.s17') }}</strong>
-                  <span>{{ t('screens.maintenances.s18') }}</span>
+                  <strong>No hay visitas programadas</strong>
+                  <span>Agenda tu primer mantenimiento preventivo.</span>
                 </div>
               </td>
             </tr>
@@ -191,14 +181,14 @@ async function save() {
               <td>{{ formatDate(`${item.date}T00:00:00`, false) }}</td>
               <td>{{ item.time }}</td>
               <td style="white-space: normal; min-width: 220px">{{ equipmentNames(item.equipmentIds) }}</td>
-              <td><span class="cc-badge cc-badge-assigned">{{ item.status === 'Agendado' ? t('screens.maintenances.scheduledStatus') : item.status }}</span></td>
+              <td><span class="cc-badge cc-badge-assigned">{{ item.status }}</span></td>
             </tr>
             </tbody>
           </table>
         </div>
 
         <div class="cc-table-footer">
-          {{ t('screens.maintenances.scheduledCount', { count: sortedMaintenances.length }) }}
+          {{ sortedMaintenances.length }} visita(s) registrada(s)
         </div>
       </section>
 
@@ -207,32 +197,33 @@ async function save() {
 
     <pv-dialog
         v-model:visible="visible"
-        :header="t('screens.maintenances.s26')"
+        header="Agendar mantenimiento preventivo"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
       <form class="cc-form" @submit.prevent="save">
         <p class="cc-dialog-desc">
-          {{ t('screens.maintenances.dateIntro', { remaining }) }}
+          Elige la fecha, la hora y los equipos que revisará el técnico.
+          Esta visita consumirá 1 de tus {{ remaining }} cupo(s) disponible(s).
         </p>
 
         <div class="cc-form-row">
           <div class="cc-field">
-            <label for="m-date">{{ t('screens.maintenances.s12') }}</label>
+            <label for="m-date">Fecha</label>
             <input id="m-date" v-model="form.date" class="cc-input" type="date" :min="today" required />
           </div>
 
           <div class="cc-field">
-            <label for="m-time">{{ t('screens.maintenances.s13') }}</label>
+            <label for="m-time">Hora</label>
             <input id="m-time" v-model="form.time" class="cc-input" type="time" required />
           </div>
         </div>
 
         <div class="cc-field">
-          <label>{{ t('screens.maintenances.s19') }}</label>
+          <label>Equipos a revisar</label>
 
           <div v-if="!equipment.equipments.length" class="cc-timeline-empty">
-            {{ t('screens.maintenances.s20') }}
+            No hay equipos registrados.
           </div>
 
           <label
@@ -253,7 +244,7 @@ async function save() {
 
         <div class="cc-dialog-actions">
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="visible = false">
-            {{ t('screens.maintenances.s21') }}
+            Cancelar
           </button>
 
           <button
@@ -262,7 +253,7 @@ async function save() {
               :disabled="saving || !form.equipmentIds.length"
           >
             <i class="pi pi-calendar-plus"></i>
-            {{ saving ? t('screens.maintenances.saving') : t('screens.maintenances.schedule') }}
+            {{ saving ? 'Agendando...' : 'Agendar visita' }}
           </button>
         </div>
       </form>
