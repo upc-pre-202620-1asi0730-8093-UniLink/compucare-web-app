@@ -123,7 +123,7 @@ async function saveQuote() {
       }))
     })
 
-    ok('Cotización enviada al cliente')
+    ok(t('screens.quotations.created'))
     createVisible.value = false
   } catch (error) {
     fail(error)
@@ -134,23 +134,23 @@ async function saveQuote() {
 
 function approve(quote) {
   confirm.require({
-    header: 'Aprobar cotización',
-    message: `¿Apruebas la cotización #${quote.id} por ${formatMoney(quote.total)}?`,
+    header: t('screens.quotations.approveTitle'),
+    message: t('screens.quotations.approveQuestion', { id: quote.id, amount: formatMoney(quote.total) }),
     icon: 'pi pi-check-circle',
-    acceptLabel: 'Sí, aprobar',
-    rejectLabel: 'Volver',
-    accept: () => changeStatus(quote, 'APPROVED', 'Cotización aprobada')
+    acceptLabel: t('screens.quotations.confirmApprove'),
+    rejectLabel: t('screens.quotations.back'),
+    accept: () => changeStatus(quote, 'APPROVED', t('screens.quotations.approved'))
   })
 }
 
 function reject(quote) {
   confirm.require({
-    header: 'Rechazar cotización',
-    message: `¿Deseas rechazar la cotización #${quote.id}? La orden de servicio quedará pausada.`,
+    header: t('screens.quotations.rejectTitle'),
+    message: t('screens.quotations.rejectQuestion', { id: quote.id }),
     icon: 'pi pi-exclamation-triangle',
-    acceptLabel: 'Sí, rechazar',
-    rejectLabel: 'Volver',
-    accept: () => changeStatus(quote, 'REJECTED', 'Cotización rechazada')
+    acceptLabel: t('screens.quotations.confirmReject'),
+    rejectLabel: t('screens.quotations.back'),
+    accept: () => changeStatus(quote, 'REJECTED', t('screens.quotations.rejected'))
   })
 }
 
@@ -187,7 +187,7 @@ async function pay() {
       last4: digits
     })
 
-    ok('Pago registrado correctamente')
+    ok(t('screens.quotations.paid'))
     payVisible.value = false
   } catch (error) {
     fail(error)
@@ -204,11 +204,7 @@ async function pay() {
       <PageHeader
           :eyebrow="t('screens.quotations.s27')"
           :title="t('screens.quotations.s28')"
-          :description="isAdmin
-            ? 'Revisa las cotizaciones del soporte técnico, apruébalas y realiza el pago desde un solo lugar.'
-            : isTechnician
-              ? 'Cotiza repuestos y servicios adicionales para los tickets que tienes asignados.'
-              : 'Consulta todas las cotizaciones emitidas por el equipo técnico.'"
+          :description="isAdmin ? t('screens.quotations.adminDescription') : isTechnician ? t('screens.quotations.technicianDescription') : t('screens.quotations.observerDescription')"
       >
         <button
             v-if="isTechnician"
@@ -308,9 +304,7 @@ async function pay() {
                   <i class="pi pi-file"></i>
                   <strong>{{ t('screens.quotations.s19') }}</strong>
                   <span>
-                    {{ isTechnician
-                      ? 'Crea una cotización desde uno de tus tickets asignados.'
-                      : 'Cuando el técnico emita una cotización, aparecerá aquí.' }}
+                    {{ t(isTechnician ? 'screens.quotations.emptyTech' : 'screens.quotations.emptyOther') }}
                   </span>
                 </div>
               </td>
@@ -335,7 +329,7 @@ async function pay() {
                       class="cc-icon-btn"
                       type="button"
                       :title="t('screens.quotations.s32')"
-                      :aria-label="`Ver detalle de la cotización ${quote.id}`"
+                      :aria-label="t('screens.quotations.viewAria', { id: quote.id })"
                       @click="openDetail(quote)"
                   >
                     <i class="pi pi-eye"></i>
@@ -346,7 +340,7 @@ async function pay() {
                         class="cc-icon-btn"
                         type="button"
                         :title="t('screens.quotations.s33')"
-                        :aria-label="`Aprobar cotización ${quote.id}`"
+                        :aria-label="t('screens.quotations.approveAria', { id: quote.id })"
                         @click="approve(quote)"
                     >
                       <i class="pi pi-check"></i>
@@ -356,7 +350,7 @@ async function pay() {
                         class="cc-icon-btn cc-danger"
                         type="button"
                         :title="t('screens.quotations.s34')"
-                        :aria-label="`Rechazar cotización ${quote.id}`"
+                        :aria-label="t('screens.quotations.rejectAria', { id: quote.id })"
                         @click="reject(quote)"
                     >
                       <i class="pi pi-times"></i>
@@ -368,7 +362,7 @@ async function pay() {
                       class="cc-icon-btn"
                       type="button"
                       :title="t('screens.quotations.s35')"
-                      :aria-label="`Pagar cotización ${quote.id}`"
+                      :aria-label="t('screens.quotations.payAria', { id: quote.id })"
                       @click="openPay(quote)"
                   >
                     <i class="pi pi-credit-card"></i>
@@ -381,7 +375,7 @@ async function pay() {
         </div>
 
         <div class="cc-table-footer">
-          Mostrando {{ filteredQuotes.length }} de {{ quotes.length }} cotizaciones
+          {{ t('screens.quotations.showing', { shown: filteredQuotes.length, total: quotes.length }) }}
         </div>
       </section>
 
@@ -391,7 +385,7 @@ async function pay() {
     <!-- Detalle de la cotización -->
     <pv-dialog
         v-model:visible="detailVisible"
-        :header="`Cotización #${selected?.id ?? ''}`"
+        :header="t('screens.quotations.quoteHeader', { id: selected?.id ?? '' })"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
@@ -434,7 +428,7 @@ async function pay() {
 
         <div class="cc-banner cc-banner-info" v-else>
           <i class="pi pi-info-circle"></i>
-          <span>Estado actual: {{ quotationStatusLabel(selected.status) }}.</span>
+          <span>{{ t('screens.quotations.currentStatus', { status: quotationStatusLabel(selected.status) }) }}</span>
         </div>
       </div>
     </pv-dialog>
@@ -478,7 +472,7 @@ async function pay() {
                 v-model="item.description"
                 class="cc-input"
                 :placeholder="t('screens.quotations.s20')"
-                :aria-label="`Descripción del ítem ${index + 1}`"
+                :aria-label="t('screens.quotations.itemDescription', { number: index + 1 })"
             />
 
             <input
@@ -488,7 +482,7 @@ async function pay() {
                 min="0.01"
                 step="0.01"
                 :placeholder="t('screens.quotations.s37')"
-                :aria-label="`Costo del ítem ${index + 1}`"
+                :aria-label="t('screens.quotations.itemCost', { number: index + 1 })"
             />
 
             <button
@@ -510,7 +504,7 @@ async function pay() {
 
         <div class="cc-banner cc-banner-info" style="margin-bottom: 0">
           <i class="pi pi-wallet"></i>
-          <span>Total de la cotización: <strong>{{ formatMoney(formTotal) }}</strong></span>
+          <span>{{ t('screens.quotations.totalQuote') }} <strong>{{ formatMoney(formTotal) }}</strong></span>
         </div>
 
         <div class="cc-dialog-actions">
@@ -520,7 +514,7 @@ async function pay() {
 
           <button class="cc-primary-btn" type="submit" :disabled="saving || !canCreate">
             <i class="pi pi-send"></i>
-            {{ saving ? 'Enviando...' : 'Enviar cotización' }}
+            {{ saving ? t('screens.quotations.sending') : t('screens.quotations.sendQuote') }}
           </button>
         </div>
       </form>
@@ -529,7 +523,7 @@ async function pay() {
     <!-- Pago simulado (administrador) -->
     <pv-dialog
         v-model:visible="payVisible"
-        :header="`Pagar cotización #${selected?.id ?? ''}`"
+        :header="t('screens.quotations.payHeader', { id: selected?.id ?? '' })"
         modal
         :style="{ width: 'min(480px, 94vw)' }"
     >
@@ -567,7 +561,7 @@ async function pay() {
 
           <button class="cc-primary-btn" type="submit" :disabled="saving">
             <i class="pi pi-lock"></i>
-            {{ saving ? 'Procesando...' : 'Pagar ahora' }}
+            {{ saving ? t('screens.quotations.processing') : t('screens.quotations.payNow') }}
           </button>
         </div>
       </form>
