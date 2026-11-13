@@ -108,7 +108,7 @@ async function assign(ticket) {
 
   try {
     await store.assignTicket(ticket.id, technicianId)
-    ok('Técnico asignado y notificado correctamente')
+    ok(t('screens.adminTickets.assignedSuccess'))
   } catch (error) {
     fail(error)
   } finally {
@@ -303,7 +303,7 @@ function statusClass(status) {
                     </span>
 
                   <span>
-                      {{ ticket.employeeName || 'Usuario' }}
+                      {{ ticket.employeeName || t('screens.adminTickets.unknownUser') }}
                     </span>
                 </div>
               </td>
@@ -311,7 +311,7 @@ function statusClass(status) {
               <td>
                 <div class="equipment-cell">
                   <i class="pi pi-desktop"></i>
-                  {{ ticket.equipmentName || 'Sin identificar' }}
+                  {{ ticket.equipmentName || t('screens.adminTickets.unknownEquipment') }}
                 </div>
               </td>
 
@@ -336,7 +336,7 @@ function statusClass(status) {
                   <select
                       v-model="chosen[ticket.id]"
                       class="technician-select"
-                      :aria-label="`Seleccionar técnico para ticket ${ticket.id}`"
+                      :aria-label="t('screens.adminTickets.selectAria', { id: ticket.id })"
                   >
                     <option :value="undefined" disabled>
                       {{ t('screens.adminTickets.s22') }}
@@ -361,7 +361,7 @@ function statusClass(status) {
                       @click="assign(ticket)"
                   >
                     <i class="pi pi-check"></i>
-                    {{ assigning[ticket.id] ? 'Asignando...' : 'Asignar' }}
+                    {{ assigning[ticket.id] ? t('screens.adminTickets.assigning') : t('screens.adminTickets.assign') }}
                   </button>
                 </div>
 
@@ -369,7 +369,7 @@ function statusClass(status) {
                   <i class="pi pi-user"></i>
 
                   <span>
-                      {{ ticket.technicianName || 'Sin asignar' }}
+                      {{ ticket.technicianName || t('screens.adminTickets.unassigned') }}
                     </span>
                 </div>
               </td>
@@ -380,12 +380,11 @@ function statusClass(status) {
 
         <div class="table-footer">
           <span>
-            Mostrando {{ filteredTickets.length }} de
-            {{ tickets.length }} solicitudes
+            {{ t('screens.adminTickets.showing', { shown: filteredTickets.length, total: tickets.length }) }}
           </span>
 
           <span>
-            {{ iam.technicians.length }} técnicos disponibles en el sistema
+            {{ t('screens.adminTickets.technicians', { count: iam.technicians.length }) }}
           </span>
         </div>
       </section>
