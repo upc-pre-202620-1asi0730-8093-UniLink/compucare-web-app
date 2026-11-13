@@ -63,7 +63,7 @@ async function subscribe() {
       email: billing.value.email.trim()
     })
 
-    ok(`Suscripción al plan ${chosenPlan.value.name} activada`)
+    ok(t('screens.subscription.subscribed', { name: chosenPlan.value.name }))
     billingVisible.value = false
   } catch (error) {
     fail(error)
@@ -74,15 +74,15 @@ async function subscribe() {
 
 function renew() {
   confirm.require({
-    header: 'Renovar suscripción',
-    message: 'Se reiniciará tu bolsa de horas y tus visitas preventivas para un nuevo periodo. ¿Deseas continuar?',
+    header: t('screens.subscription.renewTitle'),
+    message: t('screens.subscription.renewQuestion'),
     icon: 'pi pi-refresh',
-    acceptLabel: 'Sí, renovar',
-    rejectLabel: 'Volver',
+    acceptLabel: t('screens.subscription.confirmRenew'),
+    rejectLabel: t('screens.subscription.back'),
     accept: async () => {
       try {
         await store.renew()
-        ok('Suscripción renovada correctamente')
+        ok(t('screens.subscription.renewed'))
       } catch (error) {
         fail(error)
       }
@@ -130,8 +130,7 @@ function renew() {
         >
           <i class="pi pi-exclamation-triangle"></i>
           <span>
-            Has consumido el {{ balance.percentUsed }}% de tu bolsa de horas.
-            Evalúa renovar o cambiar a un plan superior.
+            {{ t('screens.subscription.usageAlert', { percent: balance.percentUsed }) }}
           </span>
         </div>
 
@@ -144,7 +143,7 @@ function renew() {
               </div>
               <strong>{{ balance.planName }}</strong>
               <span class="cc-stat-caption">
-                {{ currentPlan ? `${formatMoney(currentPlan.price)} al mes` : 'Suscripción activa' }}
+                {{ currentPlan ? t('screens.subscription.perMonth', { price: formatMoney(currentPlan.price) }) : t('screens.subscription.activeSubscription') }}
               </span>
             </article>
 
@@ -154,7 +153,7 @@ function renew() {
                 <span class="cc-stat-icon cc-icon-done"><i class="pi pi-clock"></i></span>
               </div>
               <strong>{{ balance.hoursRemaining }} h</strong>
-              <span class="cc-stat-caption">De {{ balance.hoursTotal }} h del periodo</span>
+              <span class="cc-stat-caption">{{ t('screens.subscription.includedHours', { total: balance.hoursTotal }) }}</span>
             </article>
 
             <article class="cc-stat">
@@ -163,7 +162,7 @@ function renew() {
                 <span class="cc-stat-icon cc-icon-active"><i class="pi pi-calendar"></i></span>
               </div>
               <strong>{{ balance.preventiveRemaining }}</strong>
-              <span class="cc-stat-caption">De {{ balance.preventiveTotal }} disponibles</span>
+              <span class="cc-stat-caption">{{ t('screens.subscription.preventiveRemaining', { total: balance.preventiveTotal }) }}</span>
             </article>
 
             <article class="cc-stat">
@@ -172,7 +171,7 @@ function renew() {
                 <span class="cc-stat-icon cc-icon-pending"><i class="pi pi-refresh"></i></span>
               </div>
               <strong style="font-size: 22px">{{ formatDate(balance.renewsAt, false) }}</strong>
-              <span class="cc-stat-caption">Inicio: {{ formatDate(balance.startedAt, false) }}</span>
+              <span class="cc-stat-caption">{{ t('screens.subscription.periodStart', { date: formatDate(balance.startedAt, false) }) }}</span>
             </article>
           </section>
 
@@ -180,11 +179,11 @@ function renew() {
             <div class="cc-card-head">
               <div>
                 <h2>{{ t('screens.subscription.s7') }}</h2>
-                <p>{{ balance.hoursUsed }} h usadas de {{ balance.hoursTotal }} h</p>
+                <p>{{ t('screens.subscription.hoursUsed', { used: balance.hoursUsed, total: balance.hoursTotal }) }}</p>
               </div>
 
               <span class="cc-badge" :class="balance.percentUsed >= 80 ? 'cc-badge-pending' : 'cc-badge-done'">
-                {{ balance.percentUsed }}% consumido
+                {{ t('screens.subscription.percentageUsed', { percent: balance.percentUsed }) }}
               </span>
             </div>
 
@@ -208,9 +207,7 @@ function renew() {
             <div>
               <h2>{{ t('screens.subscription.s8') }}</h2>
               <p>
-                {{ balance
-                  ? 'Cambiar de plan reinicia tu bolsa de horas y tus visitas preventivas.'
-                  : 'Selecciona el plan que mejor se adapte a tu empresa.' }}
+                {{ t(balance ? 'screens.subscription.changePlan' : 'screens.subscription.choosePlan') }}
               </p>
             </div>
           </div>
@@ -243,9 +240,7 @@ function renew() {
                     :disabled="plan.id === balance?.planId"
                     @click="openSubscribe(plan)"
                 >
-                  {{ plan.id === balance?.planId
-                    ? 'Plan activo'
-                    : balance ? 'Cambiar a este plan' : 'Suscribirme' }}
+                  {{ t(plan.id === balance?.planId ? 'screens.subscription.planActive' : balance ? 'screens.subscription.changeToPlan' : 'screens.subscription.subscribe') }}
                 </button>
               </article>
             </div>
@@ -258,23 +253,22 @@ function renew() {
 
     <pv-dialog
         v-model:visible="billingVisible"
-        :header="`Plan ${chosenPlan?.name ?? ''}`"
+        :header="t('screens.subscription.planHeader', { name: chosenPlan?.name ?? '' })"
         modal
         :style="{ width: 'min(480px, 94vw)' }"
     >
       <form class="cc-form" @submit.prevent="subscribe">
         <p class="cc-dialog-desc">
-          Confirma los datos de facturación para activar el plan
-          {{ chosenPlan?.name }} ({{ formatMoney(chosenPlan?.price) }} al mes).
+          {{ t('screens.subscription.billingDescription', { name: chosenPlan?.name, price: formatMoney(chosenPlan?.price) }) }}
         </p>
 
         <div class="cc-field">
-          <label for="billing-name">Nombre o razón social</label>
+          <label for="billing-name">{{ t('screens.subscription.billingName') }}</label>
           <input id="billing-name" v-model="billing.name" class="cc-input" required />
         </div>
 
         <div class="cc-field">
-          <label for="billing-email">Correo de facturación</label>
+          <label for="billing-email">{{ t('screens.subscription.billingEmail') }}</label>
           <input id="billing-email" v-model="billing.email" class="cc-input" type="email" required />
         </div>
 
@@ -285,7 +279,7 @@ function renew() {
 
           <button class="cc-primary-btn" type="submit" :disabled="saving">
             <i class="pi pi-check"></i>
-            {{ saving ? 'Activando...' : 'Confirmar plan' }}
+            {{ saving ? t('screens.subscription.activating') : t('screens.subscription.confirmPlan') }}
           </button>
         </div>
       </form>
