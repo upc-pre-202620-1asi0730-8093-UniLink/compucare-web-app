@@ -134,6 +134,37 @@ export default {
         emptyDescription: "Cuando tus empleados reporten una falla, aparecerá aquí.",
         registeredEquipment: "Equipo registrado",
     },
+    domain: {
+        "unspecified": "Sin especificar",
+        "ticket": {
+            "pending": "Pendiente de asignación",
+            "assigned": "Asignado",
+            "diagnosis": "En diagnóstico",
+            "progress": "En proceso",
+            "attended": "Atendido",
+            "resolved": "Resuelto",
+            "completed": "Completado",
+            "closed": "Cerrado",
+            "cancelled": "Cancelado"
+        },
+        "quotation": {
+            "pending": "Pendiente",
+            "approved": "Aprobada",
+            "rejected": "Rechazada",
+            "paid": "Pagada"
+        },
+        "equipment": {
+            "operational": "Operativo",
+            "repair": "En reparación"
+        },
+        "category": {
+            "hardware": "Hardware",
+            "software": "Software",
+            "network": "Red",
+            "printing": "Impresión",
+            "other": "Otro"
+        }
+    },
     tickets: {
         myTickets: 'Mis solicitudes',
         manageTickets: 'Gestión de tickets',
