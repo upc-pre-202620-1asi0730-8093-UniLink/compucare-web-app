@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref } from 'vue'
 import useSubscriptionStore from '../../application/subscription.store.js'
 import useEquipmentStore from '../../../equipment/application/equipment.store.js'
@@ -10,6 +11,7 @@ import PageFooter from '../../../shared/presentation/page-footer.vue'
 const store = useSubscriptionStore()
 const equipment = useEquipmentStore()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
 
 const loading = ref(false)
 const saving = ref(false)
@@ -87,9 +89,9 @@ async function save() {
     <div class="cc-container">
 
       <PageHeader
-          eyebrow="MANTENIMIENTO PREVENTIVO"
-          title="Mantenimientos"
-          description="Agenda las visitas preventivas incluidas en tu plan y consulta las ya programadas."
+          :eyebrow="t('screens.maintenances.s22')"
+          :title="t('screens.maintenances.s23')"
+          :description="t('screens.maintenances.s24')"
       >
         <button
             class="cc-primary-btn"
@@ -98,54 +100,54 @@ async function save() {
             @click="openSchedule"
         >
           <i class="pi pi-calendar-plus"></i>
-          Agendar visita
+          {{ t('screens.maintenances.s0') }}
         </button>
       </PageHeader>
 
       <div v-if="!loading && !store.balance" class="cc-banner cc-banner-warn" role="status">
         <i class="pi pi-exclamation-triangle"></i>
-        <span>Necesitas una suscripción activa para agendar mantenimientos preventivos.</span>
+        <span>{{ t('screens.maintenances.s1') }}</span>
       </div>
 
       <div v-else-if="!loading && remaining === 0" class="cc-banner cc-banner-warn" role="status">
         <i class="pi pi-exclamation-triangle"></i>
-        <span>Ya usaste todas las visitas preventivas de tu plan. Renueva tu suscripción para obtener más.</span>
+        <span>{{ t('screens.maintenances.s2') }}</span>
       </div>
 
-      <section class="cc-stats" aria-label="Resumen de mantenimientos">
+      <section class="cc-stats" :aria-label="t('screens.maintenances.s25')">
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Visitas disponibles</span>
+            <span>{{ t('screens.maintenances.s3') }}</span>
             <span class="cc-stat-icon cc-icon-done"><i class="pi pi-calendar"></i></span>
           </div>
           <strong>{{ remaining }}</strong>
-          <span class="cc-stat-caption">Cupos preventivos restantes</span>
+          <span class="cc-stat-caption">{{ t('screens.maintenances.s4') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Visitas usadas</span>
+            <span>{{ t('screens.maintenances.s5') }}</span>
             <span class="cc-stat-icon cc-icon-active"><i class="pi pi-check-square"></i></span>
           </div>
           <strong>{{ store.balance?.preventiveUsed ?? 0 }}</strong>
-          <span class="cc-stat-caption">Del periodo actual</span>
+          <span class="cc-stat-caption">{{ t('screens.maintenances.s6') }}</span>
         </article>
 
         <article class="cc-stat">
           <div class="cc-stat-top">
-            <span>Agendados</span>
+            <span>{{ t('screens.maintenances.s7') }}</span>
             <span class="cc-stat-icon"><i class="pi pi-list"></i></span>
           </div>
           <strong>{{ maintenances.length }}</strong>
-          <span class="cc-stat-caption">Mantenimientos registrados</span>
+          <span class="cc-stat-caption">{{ t('screens.maintenances.s8') }}</span>
         </article>
       </section>
 
       <section class="cc-card">
         <div class="cc-card-head">
           <div>
-            <h2>Visitas programadas</h2>
-            <p>Cada visita consume un cupo preventivo de tu plan.</p>
+            <h2>{{ t('screens.maintenances.s9') }}</h2>
+            <p>{{ t('screens.maintenances.s10') }}</p>
           </div>
         </div>
 
@@ -153,25 +155,25 @@ async function save() {
           <table class="cc-table">
             <thead>
             <tr>
-              <th>Visita</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Equipos</th>
-              <th>Estado</th>
+              <th>{{ t('screens.maintenances.s11') }}</th>
+              <th>{{ t('screens.maintenances.s12') }}</th>
+              <th>{{ t('screens.maintenances.s13') }}</th>
+              <th>{{ t('screens.maintenances.s14') }}</th>
+              <th>{{ t('screens.maintenances.s15') }}</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
-              <td colspan="5" class="cc-empty-cell">Cargando mantenimientos...</td>
+              <td colspan="5" class="cc-empty-cell">{{ t('screens.maintenances.s16') }}</td>
             </tr>
 
             <tr v-else-if="sortedMaintenances.length === 0">
               <td colspan="5" class="cc-empty-cell">
                 <div class="cc-empty">
                   <i class="pi pi-calendar"></i>
-                  <strong>No hay visitas programadas</strong>
-                  <span>Agenda tu primer mantenimiento preventivo.</span>
+                  <strong>{{ t('screens.maintenances.s17') }}</strong>
+                  <span>{{ t('screens.maintenances.s18') }}</span>
                 </div>
               </td>
             </tr>
@@ -197,7 +199,7 @@ async function save() {
 
     <pv-dialog
         v-model:visible="visible"
-        header="Agendar mantenimiento preventivo"
+        :header="t('screens.maintenances.s26')"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
@@ -209,21 +211,21 @@ async function save() {
 
         <div class="cc-form-row">
           <div class="cc-field">
-            <label for="m-date">Fecha</label>
+            <label for="m-date">{{ t('screens.maintenances.s12') }}</label>
             <input id="m-date" v-model="form.date" class="cc-input" type="date" :min="today" required />
           </div>
 
           <div class="cc-field">
-            <label for="m-time">Hora</label>
+            <label for="m-time">{{ t('screens.maintenances.s13') }}</label>
             <input id="m-time" v-model="form.time" class="cc-input" type="time" required />
           </div>
         </div>
 
         <div class="cc-field">
-          <label>Equipos a revisar</label>
+          <label>{{ t('screens.maintenances.s19') }}</label>
 
           <div v-if="!equipment.equipments.length" class="cc-timeline-empty">
-            No hay equipos registrados.
+            {{ t('screens.maintenances.s20') }}
           </div>
 
           <label
@@ -244,7 +246,7 @@ async function save() {
 
         <div class="cc-dialog-actions">
           <button class="cc-secondary-btn" type="button" :disabled="saving" @click="visible = false">
-            Cancelar
+            {{ t('screens.maintenances.s21') }}
           </button>
 
           <button
