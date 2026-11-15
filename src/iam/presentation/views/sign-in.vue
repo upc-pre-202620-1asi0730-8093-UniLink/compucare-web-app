@@ -1,5 +1,6 @@
 
 <script setup>
+import LandingLink from '../../../shared/presentation/landing-link.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -14,6 +15,11 @@ const password = ref('')
 const message = ref('')
 const loading = ref(false)
 const loginSuccessful = ref(false)
+
+// Video "About the Product" (Sprint 3) alojado en Microsoft Stream / SharePoint de UPC.
+// SharePoint no permite incrustar stream.aspx en un iframe, por eso se abre en una nueva pestaña.
+const aboutProductVideoUrl =
+  'https://upcedupe-my.sharepoint.com/personal/u20231b331_upc_edu_pe/_layouts/15/stream.aspx?id=%2Fpersonal%2Fu20231b331%5Fupc%5Fedu%5Fpe%2FDocuments%2Fupc%2Dpre%2D202620%2D1asi0730%2D8093%2DUniLink%2Dabout%2Dthe%2Dproduct%2Dsprint%2D3%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E8bfd98fc%2D862a%2D4d54%2D914a%2D4fec9ca703b1'
 
 async function handleLogin() {
   if (loading.value) return
@@ -71,13 +77,34 @@ async function handleLogin() {
 
       <!-- Panel izquierdo -->
       <div class="brand-panel">
-        <div class="brand-name">
-          CompuCare<span>.</span>
+        <div>
+          <div class="brand-name">
+            CompuCare<span>.</span>
+          </div>
+          <LandingLink />
         </div>
 
         <div class="brand-content">
           <h1>{{ t('auth.slogan') }}</h1>
           <p>{{ t('auth.sloganDescription') }}</p>
+
+          <a
+              class="about-product"
+              :href="aboutProductVideoUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+          >
+            <span class="about-play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+              </svg>
+            </span>
+            <span class="about-text">
+              <span class="about-label">{{ t('auth.aboutProductLabel') }}</span>
+              <span class="about-title">{{ t('auth.aboutProductTitle') }}</span>
+              <span class="about-caption">{{ t('auth.aboutProductCaption') }}</span>
+            </span>
+          </a>
         </div>
 
         <p class="brand-footer">Powered by UniLink</p>
@@ -362,6 +389,69 @@ async function handleLogin() {
 
 .brand-footer {
   font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Video About the Product */
+
+.about-product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+  padding: 16px 18px;
+  border: 1px solid rgba(199, 241, 200, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.about-product:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(199, 241, 200, 0.55);
+  transform: translateY(-1px);
+}
+
+.about-product:focus-visible {
+  outline: 3px solid #c7f1c8;
+  outline-offset: 3px;
+}
+
+.about-play {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #c7f1c8;
+  color: #112d35;
+}
+
+.about-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.about-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c7f1c8;
+}
+
+.about-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.about-caption {
+  font-size: 12px;
   opacity: 0.7;
 }
 
