@@ -2,10 +2,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import useIamStore from '../../application/iam.store.js'
 
 const router = useRouter()
 const iamStore = useIamStore()
+const { t } = useI18n({ useScope: 'global' })
 
 const email = ref('')
 const password = ref('')
@@ -35,13 +37,10 @@ async function handleLogin() {
     if (target.matched.length > 0) {
       await router.push(destination)
     } else {
-      message.value =
-          'Inicio de sesión correcto. Tu panel de usuario estará disponible próximamente.'
+      message.value = t('auth.loginSuccessNoPanel')
     }
   } catch (error) {
-    message.value =
-        error.response?.data?.message ||
-        'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.'
+    message.value = error.response?.data?.message || t('auth.loginError')
   } finally {
     loading.value = false
   }
@@ -77,11 +76,8 @@ async function handleLogin() {
         </div>
 
         <div class="brand-content">
-          <h1>Tu tecnología, en buenas manos.</h1>
-          <p>
-            Gestiona el mantenimiento y soporte técnico
-            de los equipos de tu empresa desde un solo lugar.
-          </p>
+          <h1>{{ t('auth.slogan') }}</h1>
+          <p>{{ t('auth.sloganDescription') }}</p>
         </div>
 
         <p class="brand-footer">Powered by UniLink</p>
@@ -110,16 +106,16 @@ async function handleLogin() {
 
         <!-- Formulario -->
         <div class="form-content">
-          <h2>Bienvenido de nuevo</h2>
+          <h2>{{ t('auth.welcomeBack') }}</h2>
 
           <p class="subtitle">
-            Ingresa tus credenciales para acceder a CompuCare.
+            {{ t('auth.loginDescription') }}
           </p>
 
           <form @submit.prevent="handleLogin">
 
             <div class="field">
-              <label for="email">Correo electrónico</label>
+              <label for="email">{{ t('auth.email') }}</label>
               <input
                   id="email"
                   v-model.trim="email"
@@ -132,12 +128,12 @@ async function handleLogin() {
             </div>
 
             <div class="field">
-              <label for="password">Contraseña</label>
+              <label for="password">{{ t('auth.password') }}</label>
               <input
                   id="password"
                   v-model="password"
                   type="password"
-                  placeholder="Ingresa tu contraseña"
+                  :placeholder="t('auth.passwordPlaceholder')"
                   autocomplete="current-password"
                   :disabled="loading"
                   required
@@ -149,7 +145,7 @@ async function handleLogin() {
                 class="login-button"
                 :disabled="loading"
             >
-              {{ loading ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+              {{ loading ? t('auth.loggingIn') : t('auth.login') }}
             </button>
 
             <p
@@ -163,13 +159,13 @@ async function handleLogin() {
           </form>
 
           <div class="auth-links">
-            <router-link to="/forgot-password">¿Olvidaste tu contraseña?</router-link>
-            <router-link to="/sign-up">Registrar empresa</router-link>
+            <router-link to="/forgot-password">{{ t('auth.forgotPassword') }}</router-link>
+            <router-link to="/sign-up">{{ t('auth.registerCompany') }}</router-link>
           </div>
 
           <p class="help-text">
-            ¿Necesitas ayuda para acceder?
-            Contacta al administrador de tu empresa.
+            {{ t('auth.needHelp') }}
+            {{ t('auth.contactAdmin') }}
           </p>
         </div>
       </div>

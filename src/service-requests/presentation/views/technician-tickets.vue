@@ -1,6 +1,9 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAutoRefresh } from '../../../shared/application/use-auto-refresh.js'
+import { useDomainLabels } from '../../../i18n/domain-labels.js'
 import useTicketStore from '../../application/ticket.store.js'
 import useQuotationStore from '../../../quotations/application/quotation.store.js'
 import { useFeedback } from '../../../shared/presentation/use-feedback.js'
@@ -8,6 +11,9 @@ import { useFeedback } from '../../../shared/presentation/use-feedback.js'
 const store = useTicketStore()
 const quotes = useQuotationStore()
 const { ok, fail } = useFeedback()
+const { t } = useI18n({ useScope: 'global' })
+const { ticketStatusLabel, quotationStatusLabel } = useDomainLabels()
+const { refresh, refreshing } = useAutoRefresh(() => Promise.all([store.fetchTickets(), quotes.fetchQuotes()]))
 
 const loading = ref(false)
 const processing = ref(false)
@@ -60,7 +66,7 @@ const diagnosisCount = computed(() =>
 
 const completedCount = computed(() =>
     tickets.value.filter(ticket =>
-        ['Resuelto', 'Completado', 'Cerrado'].includes(ticket.status)
+        ['Atendido', 'Resuelto', 'Completado', 'Cerrado'].includes(ticket.status)
     ).length
 )
 
@@ -79,10 +85,14 @@ onMounted(async () => {
   }
 })
 
+function quoteIsBlocked(ticketId) {
+  return (quotes.quotes || []).some(q => q.ticketId === ticketId && ['PENDING', 'REJECTED'].includes(q.status))
+}
+
 function quoteStatusOf(ticketId) {
   return (quotes.quotes || [])
       .filter(quote => quote.ticketId === ticketId)
-      .map(quote => quote.status)
+      .map(quote => quotationStatusLabel(quote.status))
       .join(', ')
 }
 
@@ -93,7 +103,7 @@ async function start(ticket) {
 
   try {
     await store.startDiagnosis(ticket.id)
-    ok('Diagnóstico iniciado correctamente')
+    ok(t('screens.technicianTickets.started'))
   } catch (error) {
     fail(error)
   } finally {
@@ -102,6 +112,10 @@ async function start(ticket) {
 }
 
 function openClose(ticket) {
+  if (ticket.paused || quoteIsBlocked(ticket.id)) {
+    fail(new Error(t('common.unresolvedQuotation')))
+    return
+  }
   target.value = ticket
 
   report.value = {
@@ -115,6 +129,10 @@ function openClose(ticket) {
 
 async function close() {
   if (!target.value || processing.value) return
+  if (target.value.paused || quoteIsBlocked(target.value.id)) {
+    fail(new Error(t('common.unresolvedQuotation')))
+    return
+  }
 
   if (
       !report.value.diagnosis.trim() ||
@@ -133,7 +151,7 @@ async function close() {
       hours: Number(report.value.hours)
     })
 
-    ok('Ticket atendido y horas registradas')
+    ok(t('screens.technicianTickets.closed'))
     closeVisible.value = false
     target.value = null
   } catch (error) {
@@ -182,7 +200,7 @@ async function sendQuote() {
       }))
     })
 
-    ok('Cotización enviada para aprobación')
+    ok(t('screens.technicianTickets.quoteSent'))
     quoteVisible.value = false
     target.value = null
   } catch (error) {
@@ -198,6 +216,7 @@ function statusClass(status) {
   if (value.includes('asignado')) return 'status-assigned'
   if (value.includes('diagnóstico')) return 'status-progress'
   if (value.includes('proceso')) return 'status-progress'
+  if (value.includes('atendido')) return 'status-completed'
   if (value.includes('resuelto')) return 'status-completed'
   if (value.includes('completado')) return 'status-completed'
   if (value.includes('cerrado')) return 'status-completed'
@@ -215,77 +234,82 @@ function statusClass(status) {
         <div class="header-content">
           <div class="eyebrow">
             <span class="eyebrow-dot"></span>
-            CENTRO DE SERVICIO TÉCNICO
+            {{ t('screens.technicianTickets.s0') }}
           </div>
 
-          <h1>Mis asignaciones</h1>
+          <h1>{{ t('screens.technicianTickets.s1') }}</h1>
 
           <p>
-            Consulta los equipos que requieren atención,
-            registra diagnósticos y documenta los trabajos realizados.
+            {{ t('screens.technicianTickets.s2') }}
           </p>
         </div>
 
-        <div class="header-icon" aria-hidden="true">
-          <i class="pi pi-wrench"></i>
-        </div>
+        <button
+            type="button"
+            class="action-button secondary-action"
+            :disabled="refreshing"
+            @click="refresh().catch(fail)"
+        >
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ refreshing ? t('common.refreshing') : t('common.refresh') }}
+        </button>
       </header>
 
       <section class="stats-grid">
         <article class="stat-card">
           <div class="stat-top">
-            <span>Total de tickets</span>
+            <span>{{ t('screens.technicianTickets.s3') }}</span>
             <span class="stat-icon">
               <i class="pi pi-list"></i>
             </span>
           </div>
 
           <strong>{{ tickets.length }}</strong>
-          <span class="stat-caption">Solicitudes disponibles</span>
+          <span class="stat-caption">{{ t('screens.technicianTickets.s4') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>Asignados</span>
+            <span>{{ t('screens.technicianTickets.s5') }}</span>
             <span class="stat-icon assigned-icon">
               <i class="pi pi-clipboard"></i>
             </span>
           </div>
 
           <strong>{{ assignedCount }}</strong>
-          <span class="stat-caption">Pendientes de diagnóstico</span>
+          <span class="stat-caption">{{ t('screens.technicianTickets.s6') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>En diagnóstico</span>
+            <span>{{ t('screens.technicianTickets.s7') }}</span>
             <span class="stat-icon diagnosis-icon">
               <i class="pi pi-cog"></i>
             </span>
           </div>
 
           <strong>{{ diagnosisCount }}</strong>
-          <span class="stat-caption">Trabajos en proceso</span>
+          <span class="stat-caption">{{ t('screens.technicianTickets.s8') }}</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-top">
-            <span>Finalizados</span>
+            <span>{{ t('screens.technicianTickets.s9') }}</span>
             <span class="stat-icon completed-icon">
               <i class="pi pi-check-circle"></i>
             </span>
           </div>
 
           <strong>{{ completedCount }}</strong>
-          <span class="stat-caption">Atenciones realizadas</span>
+          <span class="stat-caption">{{ t('screens.technicianTickets.s10') }}</span>
         </article>
       </section>
 
       <section class="tickets-card">
         <div class="section-heading">
           <div>
-            <h2>Tickets asignados</h2>
-            <p>Gestiona las intervenciones técnicas pendientes.</p>
+            <h2>{{ t('screens.technicianTickets.s11') }}</h2>
+            <p>{{ t('screens.technicianTickets.s12') }}</p>
           </div>
 
           <div class="search-box">
@@ -294,8 +318,8 @@ function statusClass(status) {
             <input
                 v-model="search"
                 type="search"
-                placeholder="Buscar ticket..."
-                aria-label="Buscar tickets"
+                :placeholder="t('screens.technicianTickets.s29')"
+                :aria-label="t('screens.technicianTickets.s30')"
             />
           </div>
         </div>
@@ -304,19 +328,19 @@ function statusClass(status) {
           <table class="tickets-table">
             <thead>
             <tr>
-              <th>Ticket</th>
-              <th>Equipo</th>
-              <th>Descripción de la falla</th>
-              <th>Estado</th>
-              <th>Cotización</th>
-              <th>Acciones</th>
+              <th>{{ t('screens.technicianTickets.s13') }}</th>
+              <th>{{ t('screens.technicianTickets.s14') }}</th>
+              <th>{{ t('screens.technicianTickets.s15') }}</th>
+              <th>{{ t('screens.technicianTickets.s16') }}</th>
+              <th>{{ t('screens.technicianTickets.s17') }}</th>
+              <th>{{ t('screens.technicianTickets.s18') }}</th>
             </tr>
             </thead>
 
             <tbody>
             <tr v-if="loading">
               <td colspan="6" class="empty-cell">
-                Cargando asignaciones...
+                {{ t('screens.technicianTickets.s19') }}
               </td>
             </tr>
 
@@ -324,10 +348,9 @@ function statusClass(status) {
               <td colspan="6" class="empty-cell">
                 <div class="empty-state">
                   <i class="pi pi-inbox"></i>
-                  <strong>No hay asignaciones para mostrar</strong>
+                  <strong>{{ t('screens.technicianTickets.s20') }}</strong>
                   <span>
-                      Cuando tengas tickets asignados,
-                      aparecerán aquí.
+                      {{ t('screens.technicianTickets.s21') }}
                     </span>
                 </div>
               </td>
@@ -351,14 +374,14 @@ function statusClass(status) {
                     </span>
 
                   <span>
-                      {{ ticket.equipmentName || 'Equipo registrado' }}
+                      {{ ticket.equipmentName || t('screens.technicianTickets.equipmentFallback') }}
                     </span>
                 </div>
               </td>
 
               <td>
                   <span class="description-text">
-                    {{ ticket.description || 'Sin descripción' }}
+                    {{ ticket.description || t('screens.technicianTickets.descriptionFallback') }}
                   </span>
               </td>
 
@@ -368,14 +391,14 @@ function statusClass(status) {
                         class="status-badge"
                         :class="statusClass(ticket.status)"
                     >
-                      {{ ticket.status }}
+                      {{ ticketStatusLabel(ticket.status) }}
                     </span>
 
                   <span
                       v-if="ticket.paused"
                       class="paused-badge"
                   >
-                      Pausada
+                      {{ t('screens.technicianTickets.s22') }}
                     </span>
                 </div>
               </td>
@@ -389,7 +412,7 @@ function statusClass(status) {
                   </span>
 
                 <span v-else class="muted-text">
-                    Sin cotización
+                    {{ t('screens.technicianTickets.s23') }}
                   </span>
               </td>
 
@@ -403,7 +426,7 @@ function statusClass(status) {
                       @click="start(ticket)"
                   >
                     <i class="pi pi-play"></i>
-                    Iniciar diagnóstico
+                    {{ t('screens.technicianTickets.s24') }}
                   </button>
 
                   <template
@@ -416,17 +439,18 @@ function statusClass(status) {
                         @click="openQuote(ticket)"
                     >
                       <i class="pi pi-file-edit"></i>
-                      Cotizar
+                      {{ t('screens.technicianTickets.s25') }}
                     </button>
 
                     <button
                         class="action-button complete-action"
                         type="button"
-                        :disabled="processing"
+                        :disabled="processing || ticket.paused || quoteIsBlocked(ticket.id)"
+                        :title="ticket.paused || quoteIsBlocked(ticket.id) ? t('common.unresolvedQuotation') : ''"
                         @click="openClose(ticket)"
                     >
                       <i class="pi pi-check"></i>
-                      Cerrar
+                      {{ t('screens.technicianTickets.s26') }}
                     </button>
                   </template>
                 </div>
@@ -453,14 +477,13 @@ function statusClass(status) {
 
     <pv-dialog
         v-model:visible="closeVisible"
-        header="Informe técnico"
+        :header="t('screens.technicianTickets.technicalReport')"
         modal
         :style="{ width: 'min(520px, 94vw)' }"
     >
       <form class="dialog-form" @submit.prevent="close">
         <p class="dialog-description">
-          Registra el diagnóstico, los trabajos realizados
-          y el tiempo empleado.
+          {{ t('screens.technicianTickets.closeDescription') }}
         </p>
 
         <div class="form-field">
@@ -483,7 +506,7 @@ function statusClass(status) {
               id="work-done"
               v-model="report.workDone"
               rows="3"
-              placeholder="Describe la solución aplicada"
+              :placeholder="t('screens.technicianTickets.resolutionPlaceholder')"
               class="full-width"
               required
           />
@@ -510,7 +533,7 @@ function statusClass(status) {
               :disabled="processing"
               @click="closeVisible = false"
           >
-            Cancelar
+            {{ t('screens.technicianTickets.s27') }}
           </button>
 
           <button
@@ -518,7 +541,7 @@ function statusClass(status) {
               type="submit"
               :disabled="processing"
           >
-            {{ processing ? 'Registrando...' : 'Registrar y cerrar' }}
+            {{ processing ? t('screens.technicianTickets.processing') : t('screens.technicianTickets.finish') }}
           </button>
         </div>
       </form>
@@ -526,14 +549,13 @@ function statusClass(status) {
 
     <pv-dialog
         v-model:visible="quoteVisible"
-        header="Cotización de repuestos"
+        :header="t('screens.technicianTickets.quoteTitle')"
         modal
         :style="{ width: 'min(540px, 94vw)' }"
     >
       <form class="dialog-form" @submit.prevent="sendQuote">
         <p class="dialog-description">
-          Registra los repuestos necesarios
-          y sus costos para solicitar aprobación.
+          {{ t('screens.technicianTickets.quoteDescription') }}
         </p>
 
         <div
@@ -554,7 +576,7 @@ function statusClass(status) {
           </div>
 
           <div class="form-field">
-            <label>Costo (S/)</label>
+            <label>{{ t('screens.technicianTickets.s28') }}</label>
 
             <input
                 v-model.number="item.cost"
@@ -593,7 +615,7 @@ function statusClass(status) {
               :disabled="processing"
               @click="quoteVisible = false"
           >
-            Cancelar
+            {{ t('screens.technicianTickets.s27') }}
           </button>
 
           <button
@@ -601,7 +623,7 @@ function statusClass(status) {
               type="submit"
               :disabled="processing"
           >
-            {{ processing ? 'Enviando...' : 'Enviar cotización' }}
+            {{ processing ? t('screens.technicianTickets.sending') : t('screens.technicianTickets.sendQuote') }}
           </button>
         </div>
       </form>

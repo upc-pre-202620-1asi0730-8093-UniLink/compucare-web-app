@@ -1,12 +1,14 @@
-
 <script setup>
 import { computed, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import useIamStore from './iam/application/iam.store.js'
+import { useI18n } from 'vue-i18n'
+import LanguageSwitcher from './i18n/LanguageSwitcher.vue'
 
 const route = useRoute()
 const router = useRouter()
 const iamStore = useIamStore()
+const { t } = useI18n({ useScope: 'global' })
 
 const menuOpen = ref(false)
 
@@ -15,44 +17,36 @@ const showSidebar = computed(() =>
 )
 
 const userName = computed(() =>
-    iamStore.user?.name || 'Usuario CompuCare'
+    iamStore.user?.name || t('navigation.userFallback')
 )
 
 const userRole = computed(() => iamStore.role)
 
-const roleLabels = {
-  employee: 'Empleado',
-  technician: 'Técnico',
-  admin: 'Responsable de empresa',
-  sysadmin: 'Administrador UniLink',
-  company_manager: 'Responsable de empresa'
-}
-
 const roleLabel = computed(() =>
-    roleLabels[userRole.value] || 'Usuario'
+    t(`roles.${['employee', 'technician', 'admin', 'sysadmin', 'company_manager'].includes(userRole.value) ? (userRole.value === 'company_manager' ? 'admin' : userRole.value) : 'user'}`)
 )
 
 const menuByRole = {
   employee: [
-    { label: 'Mis solicitudes', icon: 'pi pi-ticket', path: '/my-tickets' },
-    { label: 'Mis equipos', icon: 'pi pi-desktop', path: '/equipments' }
+    { key: 'myRequests', icon: 'pi pi-ticket', path: '/my-tickets' },
+    { key: 'myEquipment', icon: 'pi pi-desktop', path: '/equipments' }
   ],
   technician: [
-    { label: 'Mis asignaciones', icon: 'pi pi-wrench', path: '/technician' },
-    { label: 'Cotizaciones', icon: 'pi pi-file', path: '/quotations' }
+    { key: 'myAssignments', icon: 'pi pi-wrench', path: '/technician' },
+    { key: 'quotations', icon: 'pi pi-file', path: '/quotations' }
   ],
   sysadmin: [
-    { label: 'Gestión de tickets', icon: 'pi pi-clipboard', path: '/admin/tickets' },
-    { label: 'Cotizaciones', icon: 'pi pi-file', path: '/quotations' }
+    { key: 'ticketManagement', icon: 'pi pi-clipboard', path: '/admin/tickets' },
+    { key: 'quotations', icon: 'pi pi-file', path: '/quotations' }
   ],
   admin: [
-    { label: 'Panel', icon: 'pi pi-home', path: '/dashboard' },
-    { label: 'Equipos', icon: 'pi pi-desktop', path: '/equipments' },
-    { label: 'Sedes', icon: 'pi pi-map-marker', path: '/locations' },
-    { label: 'Cotizaciones', icon: 'pi pi-file', path: '/quotations' },
-    { label: 'Suscripción', icon: 'pi pi-star', path: '/subscription' },
-    { label: 'Mantenimientos', icon: 'pi pi-calendar', path: '/maintenances' },
-    { label: 'Empleados', icon: 'pi pi-users', path: '/employees' }
+    { key: 'dashboard', icon: 'pi pi-home', path: '/dashboard' },
+    { key: 'equipment', icon: 'pi pi-desktop', path: '/equipments' },
+    { key: 'locations', icon: 'pi pi-map-marker', path: '/locations' },
+    { key: 'quotations', icon: 'pi pi-file', path: '/quotations' },
+    { key: 'subscription', icon: 'pi pi-star', path: '/subscription' },
+    { key: 'maintenance', icon: 'pi pi-calendar', path: '/maintenances' },
+    { key: 'employees', icon: 'pi pi-users', path: '/employees' }
   ]
 }
 
@@ -60,8 +54,8 @@ menuByRole.company_manager = menuByRole.admin
 
 const menuItems = computed(() => [
   ...(menuByRole[userRole.value] ?? []),
-  { label: 'Mi perfil', icon: 'pi pi-user', path: '/profile' }
-])
+  { key: 'myProfile', icon: 'pi pi-user', path: '/profile' }
+].map(item => ({ ...item, label: t(`navigation.${item.key}`) })))
 
 function navigate(path) {
   menuOpen.value = false
@@ -84,7 +78,9 @@ function logout() {
       <button
           class="mobile-menu-button"
           type="button"
-          aria-label="Abrir menú de navegación"
+          :aria-label="t('navigation.openMenu')"
+          :aria-expanded="menuOpen"
+          aria-controls="app-navigation"
           @click="menuOpen = true"
       >
         <i class="pi pi-bars"></i>
@@ -94,11 +90,14 @@ function logout() {
           v-if="menuOpen"
           class="sidebar-overlay"
           @click="menuOpen = false"
+          aria-hidden="true"
       ></div>
 
       <aside
+          id="app-navigation"
           class="sidebar"
           :class="{ 'sidebar-open': menuOpen }"
+          @keydown.esc="menuOpen = false"
       >
         <div class="sidebar-top">
           <div class="sidebar-brand">
@@ -119,7 +118,7 @@ function logout() {
           <button
               class="sidebar-close"
               type="button"
-              aria-label="Cerrar menú"
+              :aria-label="t('navigation.closeMenu')"
               @click="menuOpen = false"
           >
             <i class="pi pi-times"></i>
@@ -128,9 +127,9 @@ function logout() {
 
         <div class="sidebar-divider"></div>
 
-        <nav class="sidebar-navigation" aria-label="Navegación principal">
+        <nav class="sidebar-navigation" :aria-label="t('navigation.mainMenu')">
           <div class="navigation-heading">
-            MENÚ PRINCIPAL
+            {{ t('navigation.mainMenu') }}
           </div>
 
           <button
@@ -141,6 +140,7 @@ function logout() {
               :class="{
               'navigation-active': route.path === item.path
             }"
+              :aria-current="route.path === item.path ? 'page' : undefined"
               @click="navigate(item.path)"
           >
             <i :class="item.icon"></i>
@@ -150,6 +150,7 @@ function logout() {
         </nav>
 
         <div class="sidebar-bottom">
+          <div class="sidebar-language"><LanguageSwitcher /></div>
           <div class="user-card">
             <div class="user-avatar">
               {{ userName.charAt(0).toUpperCase() }}
@@ -167,11 +168,13 @@ function logout() {
               @click="logout"
           >
             <i class="pi pi-sign-out"></i>
-            Cerrar sesión
+            {{ t('navigation.logout') }}
           </button>
         </div>
       </aside>
     </template>
+
+    <div v-if="!showSidebar" class="public-language"><LanguageSwitcher /></div>
 
     <div class="app-content">
       <RouterView />
@@ -183,6 +186,18 @@ function logout() {
 </template>
 
 <style scoped>
+.public-language {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 1000;
+}
+.sidebar-language {
+  display: flex;
+  justify-content: center;
+  padding: 0 0 16px;
+}
+
 .app-shell {
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import useIamStore from '../../application/iam.store.js'
 import useSubscriptionStore from '../../../subscriptions/application/subscription.store.js'
 import AuthLayout from '../../../shared/presentation/auth-layout.vue'
@@ -9,10 +10,11 @@ const route = useRoute()
 const router = useRouter()
 const iam = useIamStore()
 const subscriptions = useSubscriptionStore()
+const { t } = useI18n({ useScope: 'global' })
 
 const form = ref({ companyName: '', ruc: '', name: '', email: '', password: '' })
 const planId = ref(route.query.plan ? Number(route.query.plan) : null)
-const card = ref({ holder: '', number: '', expiry: '', cvv: '' })
+const card = ref({ holder: '', last4: '' })
 
 const message = ref('')
 const registered = ref(false)
@@ -44,20 +46,20 @@ async function submit() {
       payload.planId = planId.value
       payload.payment = {
         holder: card.value.holder.trim(),
-        last4: card.value.number.replace(/\D/g, '').slice(-4)
+        last4: card.value.last4.trim()
       }
     }
 
     await iam.register(payload)
 
     registered.value = true
-    message.value = 'Empresa registrada. Revisa tu correo de confirmación.'
+    message.value = t('auth.registered')
 
     setTimeout(() => router.push('/login'), 1500)
   } catch (error) {
     message.value =
         error.response?.data?.message ||
-        'No se pudo registrar la empresa. Inténtalo nuevamente.'
+        t('auth.registerError')
   } finally {
     loading.value = false
   }
@@ -66,21 +68,21 @@ async function submit() {
 
 <template>
   <AuthLayout
-      title="Registra tu empresa"
-      subtitle="Crea la cuenta de administrador y empieza a gestionar el soporte técnico de tus equipos."
-      headline="Soporte técnico para tu MYPE."
-      text="Registra tu empresa, elige un plan y atiende tus incidencias con técnicos especializados."
+      :title="t('auth.signupTitle')"
+      :subtitle="t('auth.signupSubtitle')"
+      :headline="t('auth.signupHeadline')"
+      :text="t('auth.signupDescription')"
       wide
   >
     <form class="cc-form" style="gap: 18px" @submit.prevent="submit">
 
       <div class="cc-field">
-        <label for="company">Razón social</label>
+        <label for="company">{{ t('auth.companyName') }}</label>
         <input id="company" v-model="form.companyName" class="cc-input" :disabled="loading" required />
       </div>
 
       <div class="cc-field">
-        <label for="ruc">RUC</label>
+        <label for="ruc">{{ t('auth.taxId') }}</label>
         <input
             id="ruc"
             v-model="form.ruc"
@@ -88,19 +90,19 @@ async function submit() {
             inputmode="numeric"
             maxlength="11"
             pattern="\d{11}"
-            placeholder="11 dígitos"
+            :placeholder="t('auth.taxIdHint')"
             :disabled="loading"
             required
         />
       </div>
 
       <div class="cc-field">
-        <label for="admin-name">Tu nombre</label>
+        <label for="admin-name">{{ t('auth.fullName') }}</label>
         <input id="admin-name" v-model="form.name" class="cc-input" autocomplete="name" :disabled="loading" required />
       </div>
 
       <div class="cc-field">
-        <label for="admin-email">Correo corporativo</label>
+        <label for="admin-email">{{ t('auth.workEmail') }}</label>
         <input
             id="admin-email"
             v-model="form.email"
@@ -114,14 +116,14 @@ async function submit() {
       </div>
 
       <div class="cc-field">
-        <label for="admin-password">Contraseña</label>
+        <label for="admin-password">{{ t('auth.password') }}</label>
         <input
             id="admin-password"
             v-model="form.password"
             class="cc-input"
             type="password"
             minlength="6"
-            placeholder="Mínimo 6 caracteres"
+            :placeholder="t('auth.passwordMin')"
             autocomplete="new-password"
             :disabled="loading"
             required
@@ -129,14 +131,14 @@ async function submit() {
       </div>
 
       <div class="cc-field">
-        <label for="plan">Plan (opcional)</label>
+        <label for="plan">{{ t('auth.choosePlan') }}</label>
         <pv-select
             v-model="planId"
             input-id="plan"
             :options="subscriptions.plans"
             option-label="name"
             option-value="id"
-            placeholder="Elige un plan"
+            :placeholder="t('auth.selectPlan')"
             class="cc-full"
             show-clear
         />
@@ -146,44 +148,36 @@ async function submit() {
         <div class="cc-banner cc-banner-info" style="margin-bottom: 0">
           <i class="pi pi-info-circle"></i>
           <span>
-            Plan {{ plan.name }}: S/ {{ plan.price }} al mes · {{ plan.hours }} h de soporte
-            (pago simulado).
+            {{ t('auth.planDetail', { name: plan.name, price: plan.price, hours: plan.hours }) }}
           </span>
         </div>
 
         <div class="cc-field">
-          <label for="card-holder">Titular de la tarjeta de prueba</label>
+          <label for="card-holder">{{ t('auth.demoHolder') }}</label>
           <input id="card-holder" v-model="card.holder" class="cc-input" :disabled="loading" required />
         </div>
 
+        <p class="cc-dialog-desc">{{ t('auth.demoPayment') }}</p>
         <div class="cc-field">
-          <label for="card-number">Número de tarjeta de prueba</label>
+          <label for="card-last4">{{ t('auth.demoLast4') }}</label>
           <input
-              id="card-number"
-              v-model="card.number"
+              id="card-last4"
+              v-model="card.last4"
               class="cc-input"
               inputmode="numeric"
-              maxlength="16"
+              pattern="[0-9]{4}"
+              minlength="4"
+              maxlength="4"
+              autocomplete="off"
+              placeholder="1234"
               :disabled="loading"
               required
           />
         </div>
-
-        <div class="cc-form-row">
-          <div class="cc-field">
-            <label for="card-expiry">Vencimiento</label>
-            <input id="card-expiry" v-model="card.expiry" class="cc-input" placeholder="MM/AA" :disabled="loading" required />
-          </div>
-
-          <div class="cc-field">
-            <label for="card-cvv">CVV</label>
-            <input id="card-cvv" v-model="card.cvv" class="cc-input" inputmode="numeric" maxlength="4" :disabled="loading" required />
-          </div>
-        </div>
       </template>
 
       <button type="submit" class="cc-primary-btn cc-btn-block" :disabled="loading">
-        {{ loading ? 'Registrando...' : 'Registrar empresa' }}
+        {{ loading ? t('auth.registering') : t('auth.register') }}
       </button>
 
       <p
@@ -197,7 +191,7 @@ async function submit() {
       </p>
 
       <p style="margin: 4px 0 0; text-align: center; font-size: 13px; color: #66777a">
-        ¿Ya tienes una cuenta? <router-link to="/login">Inicia sesión</router-link>
+        {{ t('auth.alreadyHaveAccount') }} <router-link to="/login">{{ t('auth.signInLink') }}</router-link>
       </p>
     </form>
   </AuthLayout>

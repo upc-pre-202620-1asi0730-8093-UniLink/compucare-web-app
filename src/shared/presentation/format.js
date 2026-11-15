@@ -8,18 +8,22 @@ export const roleLabels = {
     sysadmin: 'Administrador UniLink'
 };
 
+function currentLocale() {
+    return document.documentElement.lang === 'en' ? 'en-US' : 'es-PE';
+}
+
 export function formatDate(value, withTime = true) {
     if (!value) return 'Fecha no disponible';
 
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return String(value);
 
-    return new Intl.DateTimeFormat('es-PE', {
+    return new Intl.DateTimeFormat(currentLocale(), {
         dateStyle: 'medium',
         ...(withTime ? {timeStyle: 'short'} : {})
     }).format(date);
 }
 
 export function formatMoney(value) {
-    return new Intl.NumberFormat('es-PE', {style: 'currency', currency: 'PEN'}).format(Number(value ?? 0));
+    return new Intl.NumberFormat(currentLocale(), {style: 'currency', currency: 'PEN'}).format(Number(value ?? 0));
 }

@@ -16,6 +16,9 @@ import Aura from '@primeuix/themes/aura'
 
 import App from './App.vue'
 import router from './router/index.js'
+import i18n from './i18n/index.js'
+
+import 'primeicons/primeicons.css'
 import './style.css'
 import './shared/presentation/ui.css'
 
@@ -42,6 +45,7 @@ app.component('pv-textarea', Textarea)
 app.component('pv-toast', Toast)
 app.component('pv-confirm-dialog', ConfirmDialog)
 
+app.use(i18n)
 app.use(router)
 
 app.mount('#app')

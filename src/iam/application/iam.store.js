@@ -3,17 +3,20 @@ import {computed, ref} from "vue";
 import {IamApi} from "../infrastructure/iam-api.js";
 
 const iamApi = new IamApi();
-const homeByRole = {admin: '/dashboard', employee: '/my-tickets', technician: '/technician', sysadmin: '/admin/tickets'};
+const homeByRole = {admin: '/dashboard', company_manager: '/dashboard', employee: '/my-tickets', technician: '/technician', sysadmin: '/admin/tickets'};
 
 const useIamStore = defineStore('iam', () => {
     const token = ref(localStorage.getItem('unilink_token'));
-    const user = ref(JSON.parse(localStorage.getItem('unilink_user') || 'null'));
+    let storedUser = null;
+    try { storedUser = JSON.parse(localStorage.getItem('unilink_user') || 'null'); }
+    catch { localStorage.removeItem('unilink_user'); localStorage.removeItem('unilink_token'); }
+    const user = ref(storedUser);
     const employees = ref([]);
     const technicians = ref([]);
 
-    const isAuthenticated = computed(() => !!token.value);
+    const isAuthenticated = computed(() => !!token.value && !!user.value);
     const role = computed(() => user.value?.role);
-    const homeRoute = computed(() => homeByRole[role.value] ?? '/home');
+    const homeRoute = computed(() => homeByRole[role.value] ?? '/profile');
 
     function persist() {
         localStorage.setItem('unilink_token', token.value);
