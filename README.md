@@ -49,18 +49,19 @@ Accede a la URL local que indique Vite (normalmente `http://localhost:5173`).
 
 > La API actual se encuentra en `server/server.js`, usa Node.js, JSON Server y `db.json`, y **solo sirve para desarrollo y demostración**. No es la API ASP.NET Core con Entity Framework Core exigida para la entrega. Contiene credenciales de prueba y simulación de correos; no se debe exponer públicamente como entorno productivo.
 
-## Usuarios de demostración
+## Cuentas de prueba
 
-Estas cuentas existen únicamente si se activa explícitamente el *seed* de desarrollo del backend C# con `DemoSeed__Enabled=true` y una contraseña privada `DemoSeed__Password` de **12 caracteres o más**. No deben exponerse credenciales reales en GitHub.
+La versión publicada en **https://white-hill-0d2509f1e.6.azurestaticapps.net** ya tiene datos ficticios cargados. Todas las cuentas usan la contraseña `Demo-i5kXZpR9aB!`.
 
 | Rol | Correo | Ruta inicial |
 | --- | --- | --- |
-| Administrador empresarial | `admin@mype.pe` | `/dashboard` |
-| Empleado | `empleada@mype.pe` | `/my-tickets` |
-| Técnico | `tecnico@unilink.pe` | `/technician` |
-| Administrador UniLink | `soporte@unilink.pe` | `/admin/tickets` |
+| Administrador UniLink (`sysadmin`) | `soporte@unilink.pe` | `/admin/tickets` |
+| Técnico (`technician`) | `tecnico@unilink.pe` | `/technician` |
+| Administrador de empresa (`admin`) | `admin@mype.pe` | `/dashboard` |
+| Empleado (`employee`) | `empleada@mype.pe` | `/my-tickets` |
+| Administrador de empresa (`admin`) | `gerencia@andina.pe` | `/dashboard` |
 
-La contraseña pública `123456` correspondía al **servidor Node.js de demostración anterior**, no al backend ASP.NET Core ni a las cuentas de producción.
+Hay más empleados, dos empresas, equipos, tickets en todos los estados, cotizaciones, suscripciones, valores para formularios y recorridos de prueba en **[docs/test-data.md](docs/test-data.md)**.
 
 ## Conexión con la REST API definitiva (ASP.NET Core)
 
