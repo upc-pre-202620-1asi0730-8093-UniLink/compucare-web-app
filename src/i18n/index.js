@@ -5,6 +5,10 @@ import en from './en.js'
 import screensEs from './screens-es.js'
 import screensEn from './screens-en.js'
 
+// La landing pública abre la app con ?lang=es|en para conservar el idioma elegido.
+const requestedLanguage = new URLSearchParams(window.location.search).get('lang')
+if (['es', 'en'].includes(requestedLanguage)) localStorage.setItem('compucare-language', requestedLanguage)
+
 const savedLanguage = localStorage.getItem('compucare-language')
 
 const locale = ['es', 'en'].includes(savedLanguage)

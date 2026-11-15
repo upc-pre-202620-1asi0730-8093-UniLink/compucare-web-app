@@ -62,6 +62,7 @@ export default {
         loggingIn: 'Signing in...',
         forgotPassword: 'Forgot your password?',
         registerCompany: 'Register company',
+        backToWebsite: 'Back to website',
         needHelp: 'Need help signing in?',
         contactAdmin: 'Contact your company administrator.',
         loginSuccessNoPanel: 'Sign-in successful. Your dashboard is not available yet.',
