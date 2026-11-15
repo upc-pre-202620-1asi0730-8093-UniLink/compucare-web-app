@@ -66,7 +66,7 @@ La contraseña pública `123456` correspondía al **servidor Node.js de demostra
 
 La REST API oficial está en [UniLink/compucare-api](https://github.com/upc-pre-202620-1asi0730-8093-UniLink/compucare-api). No se copia el código C# dentro de este repositorio; las vistas Vue consumen sus recursos JSON mediante Axios.
 
-**Pruebas locales, con la API C# y PostgreSQL ejecutándose:**
+**Pruebas locales, con la API C# y MySQL ejecutándose:**
 
 ```dotenv
 VITE_UNILINK_API_URL=http://localhost:5147/api/v1
@@ -74,9 +74,9 @@ VITE_UNILINK_API_URL=http://localhost:5147/api/v1
 
 Coloca esa variable en `.env.local` y ejecuta `npm run dev`. El servidor Node de `server/server.js` sigue disponible únicamente como simulador temporal. No ejecutes ambos servidores en el mismo puerto.
 
-**Netlify (versión pública):** en *Site configuration → Environment variables*, establece `VITE_UNILINK_API_URL=https://TU-DOMINIO-RAILWAY/api/v1`, reemplazando el marcador con el dominio HTTPS auténtico de Railway, y ejecuta un nuevo despliegue. Esa URL se inserta **durante la compilación de Vite**. Debes configurar CORS en la API con el origen exacto de Netlify.
+**Versión pública (Azure):** `.env.production` apunta a la API publicada en Azure App Service. Vite inserta esa URL **durante la compilación**, por lo que se versiona en el repositorio.
 
-**Comprobación:** un usuario inicia sesión, crea una solicitud y otro usuario autorizado la ve desde su propia cuenta. Las solicitudes solo se comparten si ambos conectan a la misma API y a la misma base PostgreSQL; el backend debe aplicar permisos y filtros por rol/empresa.
+**Comprobación:** un usuario inicia sesión, crea una solicitud y otro usuario autorizado la ve desde su propia cuenta. Las solicitudes solo se comparten si ambos conectan a la misma API y a la misma base MySQL; el backend debe aplicar permisos y filtros por rol/empresa.
 
 ## Scripts disponibles
 
@@ -93,14 +93,12 @@ La navegación y parte de la interfaz soportan inglés (`en`) y español (`es`) 
 
 ## Despliegue y configuración
 
-Para publicar en un hosting estático:
+El frontend se publica como **Azure Static Web App**, conectada a este repositorio de GitHub. Azure compila la aplicación en la nube con GitHub Actions cada vez que se actualiza la rama configurada.
 
-1. Construye con `npm run build`, publicando la carpeta `dist`.
-2. Configura `VITE_UNILINK_API_URL` con una **API real HTTPS desplegada**, no `localhost`.
-3. Mantén el fallback SPA de `public/_redirects` (`/* /index.html 200`) para rutas como `/login`.
-4. Comprueba que la API permita CORS desde el dominio final y que las operaciones de los cinco BC funcionen tras recargar la página.
-
-**Pendiente de AV2:** implementar y desplegar la API definitiva ASP.NET Core en C#, configurar persistencia relacional y reemplazar el servidor simulado. Los controles de autenticación/autorización deben proteger los endpoints en el servidor.
+1. `.env.production` define `VITE_UNILINK_API_URL` con la API HTTPS desplegada en Azure.
+2. `public/staticwebapp.config.json` redirige las rutas del cliente (por ejemplo `/login`) a `index.html`, para que recargar una página no devuelva 404.
+3. Antes de publicar, comprueba la compilación con `npm run build`.
+4. Configuración de la Static Web App: preset **Vue.js**, *App location* `/`, *Output location* `dist` y *Api location* vacío.
 
 ## Repositorios del equipo
 
