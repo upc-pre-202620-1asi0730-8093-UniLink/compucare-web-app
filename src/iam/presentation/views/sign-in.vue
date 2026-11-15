@@ -1,5 +1,6 @@
 
 <script setup>
+import LandingLink from '../../../shared/presentation/landing-link.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -71,8 +72,11 @@ async function handleLogin() {
 
       <!-- Panel izquierdo -->
       <div class="brand-panel">
-        <div class="brand-name">
-          CompuCare<span>.</span>
+        <div>
+          <div class="brand-name">
+            CompuCare<span>.</span>
+          </div>
+          <LandingLink />
         </div>
 
         <div class="brand-content">

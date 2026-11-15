@@ -1,4 +1,5 @@
 <script setup>
+import LandingLink from './landing-link.vue'
 // Diseño de las pantallas públicas (mismo aspecto que sign-in.vue)
 defineProps({
   headline: {type: String, default: 'Tu tecnología, en buenas manos.'},
@@ -34,8 +35,11 @@ defineProps({
     <section class="login-card">
 
       <div class="brand-panel">
-        <div class="brand-name">
-          CompuCare<span>.</span>
+        <div>
+          <div class="brand-name">
+            CompuCare<span>.</span>
+          </div>
+          <LandingLink />
         </div>
 
         <div class="brand-content">

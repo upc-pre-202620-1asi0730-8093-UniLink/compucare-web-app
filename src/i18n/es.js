@@ -62,6 +62,7 @@ export default {
         loggingIn: 'Iniciando sesión...',
         forgotPassword: '¿Olvidaste tu contraseña?',
         registerCompany: 'Registrar empresa',
+        backToWebsite: 'Volver al sitio web',
         needHelp: '¿Necesitas ayuda para acceder?',
         contactAdmin: 'Contacta al administrador de tu empresa.',
         loginSuccessNoPanel: 'Inicio de sesión correcto. Tu panel de usuario todavía no está disponible.',
