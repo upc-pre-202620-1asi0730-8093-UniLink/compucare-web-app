@@ -18,6 +18,8 @@ export class BaseApi {
             }
             const token = localStorage.getItem('unilink_token');
             if (token) config.headers.Authorization = `Bearer ${token}`;
+            // La API devuelve sus mensajes de error en el idioma elegido en la interfaz.
+            config.headers['Accept-Language'] = localStorage.getItem('compucare-language') === 'es' ? 'es' : 'en';
             return config;
         });
         // Si el token venció, vuelve al login
